@@ -3,16 +3,20 @@ var fs = require('fs');
 var path = require('path');
 var http = require('http');
 var https = require('https');
-var forward = require('http-forward');
-var app = express();
+var request = require('request-promise');
 
-var HTTP_PORT = 80
+var app = express();
+app.use(express.json());
+
+var HTTP_PORT = 80;
+const worker = "http://10.128.0.4";
 
 http.createServer(app).listen(HTTP_PORT,function() {
   console.log('Listening HTTP on port ' + HTTP_PORT);
 });
 
-app.post('/', function(req, res) {
-  req.forward = { target: 'http://10.128.0.4' };
-  forward(req, res);
+app.get('/', function(req, res) {
+  request(worker).then(r => {
+    res.send(r);
+  });
 });

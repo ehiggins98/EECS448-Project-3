@@ -6,19 +6,15 @@ var https = require('https');
 var forward = require('http-forward');
 var app = express();
 
-var HTTP_PORT = 3001;
+var HTTP_PORT = 80;
 
-// Create an HTTP service
 http.createServer(app).listen(HTTP_PORT,function() {
   console.log('Listening HTTP on port ' + HTTP_PORT);
 });
 
 
-//endpoint for tracking
-app.get('/', function(req, res) {
-  res.send(201);
+app.post('/', function(req, res) {
+  console.log(req.body);
+  res.sendStatus(200);
+  res.send(req.body);
 });
-
-function processRequest(req){
-    console.log("request processed");
-}

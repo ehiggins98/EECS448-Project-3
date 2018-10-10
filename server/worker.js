@@ -14,6 +14,6 @@ http.createServer(app).listen(HTTP_PORT,function() {
   console.log('Listening HTTP on port ' + HTTP_PORT);
 });
 
-app.get('/', function(req, res) {
-  res.send("abc");
+app.post('/', function(req, res) {
+  res.send(req.body);
 });

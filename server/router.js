@@ -1,3 +1,4 @@
+
 var express = require('express');
 var fs = require('fs');
 var path = require('path');
@@ -15,8 +16,15 @@ http.createServer(app).listen(HTTP_PORT,function() {
   console.log('Listening HTTP on port ' + HTTP_PORT);
 });
 
-app.get('/', function(req, res) {
-  request(worker).then(r => {
+app.post('/', function(req, res) {
+  var options = {
+    method: 'POST',
+    uri: worker,
+    body: req.body,
+    json: true // Automatically stringifies the body to JSON
+  };
+
+  request(options).then(r => {
     res.send(r);
   });
 });

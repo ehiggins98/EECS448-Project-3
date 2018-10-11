@@ -7,9 +7,7 @@ function parseParameters(functionString) {
 module.exports = function(params, code) {
   let pattern = /function (\w*)/g;
   let output = [];
-  let temp = console.log
   console.log = (val) => output.push(val);
-
   try {
     eval(code);
   }
@@ -37,13 +35,13 @@ module.exports = function(params, code) {
     if (executable) {
       let result = params ? executable(...params) : executable();
       console.log = temp;
-
       if (result)
         output.push(result);
-      return { result: output };
     }
+    return { result: output };
   }
   catch(err) {
+    console.log = temp;
     return { error: err.message };
   }
 }

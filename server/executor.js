@@ -1,5 +1,6 @@
+let temp = console.log;
 function parseParameters(functionString) {
-  let params = functionString.match(/\(.*\)/)[0];
+  let params = functionString.match(/\([^\{]\)/)[0];
   params = params.substr(1, params.length - 2);
   return params.split(', ');
 }

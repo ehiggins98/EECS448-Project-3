@@ -1,4 +1,3 @@
-let temp = console.log;
 function parseParameters(functionString) {
   let params = functionString.match(/\([^\{]\)/)[0];
   params = params.substr(1, params.length - 2);
@@ -7,7 +6,6 @@ function parseParameters(functionString) {
 
 module.exports = function(params, code) {
   let pattern = /function (\w*)/g;
-
   let output = [];
   let temp = console.log
   console.log = (val) => output.push(val);
@@ -20,35 +18,32 @@ module.exports = function(params, code) {
   }
 
   let functions = code.match(pattern);
-  let result = "";
+  let executable = null;
 
   if(output.length == 0 && functions) {
     if(functions.includes("function main") && typeof main === typeof(Function)) {
-      if(params) {
-        result = main(...params);
-      }
-      else {
-        result = main();
-      }
+      executable = main;
     }
     else {
       let f = functions[0].substr(functions[0].indexOf(' ') + 1, functions[0].length);
       let regex = new RegExp(`function ${f} ?\(.*\) ?\{.*\}`);
-      let functionString = code.match(regex)[0];
-      if (eval(`typeof(${f}) == typeof(Function)`)) {
-        let executable = new Function(...parseParameters(functionString), functionString.match(/\{.*\}/));
-        if(params) {
-          result = executable(...params)
-        }
-        else {
-          result = executable();
-        }
+      if (eval(`typeof(${f}) === typeof(Function)`)) {
+        let functionString = code.match(regex)[0];
+        executable = new Function(...parseParameters(functionString), functionString.match(/\{.*\}/));
       }
     }
   }
-  console.log = temp;
+  try {
+    if (executable) {
+      let result = params ? executable(...params) : executable();
+      console.log = temp;
 
-  if (result)
-    output.push(result);
-  return { result: output };
+      if (result)
+        output.push(result);
+      return { result: output };
+    }
+  }
+  catch(err) {
+    return { error: err.message };
+  }
 }

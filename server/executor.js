@@ -22,20 +22,26 @@ function aggregate(functions) {
 }
 
 function runCode(code) {
-  let myConsole = new MyConsole();
-  const vm = new VM({
-    timeout: 1000,
-    sandbox: {
-      console: myConsole
+  try {
+    let myConsole = new MyConsole();
+    const vm = new VM({
+      timeout: 8000,
+      sandbox: {
+        console: myConsole
+      }
+    });
+
+    let result = vm.run(code);
+    if (result !== undefined) {
+      myConsole.outputs.push(result);
     }
-  });
 
-  let result = vm.run(code);
-  if (result !== undefined) {
-    myConsole.outputs.push(result);
+    return myConsole.outputs;
   }
-
-  return myConsole.outputs;
+  catch (error) {
+    console.log(error.message);
+    return [ error.message ];
+  }
 }
 
 function runRaw(functions) {

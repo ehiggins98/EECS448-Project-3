@@ -10,21 +10,19 @@ var executor = require('./executor');
 var app = express();
 app.use(express.json());
 
-var HTTP_PORT = 8080;
-var executing = false;
+var HTTP_PORT = 3001;
 
 http.createServer(app).listen(HTTP_PORT,function() {
   console.log('Listening HTTP on port ' + HTTP_PORT);
 });
 
 app.get('/', function(req, res) {
-  executing ? res.sendStatus(404) : res.sendStatus(200);
-});
+  res.sendStatus(200);
+})
 
 app.post('/', function(req, res) {
-  executing = true;
+  console.log(req.body);
   let params = req.body["params"];
   let code = req.body["code"];
   res.send(executor(params, code));
-  executing = false;
 });

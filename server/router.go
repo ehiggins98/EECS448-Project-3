@@ -11,7 +11,7 @@ import (
 var workers map[string]int64
 var postClient http.Client
 
-func timeMillis() int64 {
+func TimeMillis() int64 {
   return time.Now().UnixNano() / int64(time.Millisecond);
 }
 
@@ -36,30 +36,32 @@ func forward(w http.ResponseWriter, r *http.Request) {
   for true {
     if len(workers) > 0 {
       executor, _ := getExecutor()
-      resp, err := postClient.Do(makeRequest(executor, string(body)))
+      ip, _ := GetIP(executor)
+      resp, err := postClient.Do(makeRequest(ip, string(body)))
 
       if err == nil {
         body, _ = ioutil.ReadAll(resp.Body);
-        fmt.Println(string(body))
         w.WriteHeader(200)
         w.Write(body)
+        workers[executor] = TimeMillis()
       } else {
+        fmt.Println(err)
         w.WriteHeader(500)
+        go Reset(executor)
       }
 
-      workers[executor] = timeMillis()
       break
     }
   }
 }
 
 func main() {
-  workers = map[string]int64{"localhost:3001": timeMillis(), "localhost:3002": timeMillis()}
-  timeout := time.Duration(15 * time.Second)
+  workers = map[string]int64{"worker-1": TimeMillis(), "worker-2": TimeMillis()}
+  timeout := time.Duration(8 * time.Second)
   postClient = http.Client {
     Timeout: timeout,
   }
-
+  Init()
   http.HandleFunc("/", forward)
   err := http.ListenAndServe(":3000", nil)
   if err != nil {

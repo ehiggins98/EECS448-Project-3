@@ -25,7 +25,7 @@ function runCode(code) {
   try {
     let myConsole = new MyConsole();
     const vm = new VM({
-      timeout: 8000,
+      timeout: 5000,
       sandbox: {
         console: myConsole
       }

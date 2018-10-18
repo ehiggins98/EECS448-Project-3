@@ -14,6 +14,7 @@
 		* Reset all VMs daily?
 * Mobile App
 	* Camera integration - allow users to take pictures
+	* Allow the user to upload a file
 	* See and answer programming practice questions
 	* Allowed to enter custom test cases
 	* Allow users to see all test cases, if they want to look at them

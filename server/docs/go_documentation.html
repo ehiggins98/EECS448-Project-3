@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://localhost:8080/pkg/ehiggins98/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>eecs448 - The Go Programming Language</title>
+
+<link type="text/css" rel="stylesheet" href="./go_documentation_files/style.css">
+
+<link rel="stylesheet" href="./go_documentation_files/jquery.treeview.css">
+<script type="text/javascript">window.initFuncs = [];</script>
+</head>
+<body>
+
+<div id="lowframe" style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide">The Go Programming Language</div>
+<div id="menu" style="min-width: 60px;">
+
+<a href="index.html">Home</a>
+<a href="identifiers.html">References</a>
+<a href="source.html">Node Source</a>
+
+</div>
+
+</div></div>
+
+
+
+<div id="page" class="wide" tabindex="-1" style="outline: 0px;">
+<div class="container">
+
+
+  <h1>
+    Package eecs448
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script type="text/javascript">
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "ehiggins98"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="http://localhost:8080/pkg/ehiggins98/#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="http://localhost:8080/pkg/ehiggins98/#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				
+			</div>
+		</div>
+		
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+				
+				<dd><a href="http://localhost:8080/pkg/ehiggins98/#Forward">func Forward(w http.ResponseWriter, r *http.Request)</a></dd>
+			
+				
+				<dd><a href="http://localhost:8080/pkg/ehiggins98/#GetExecutor">func GetExecutor() (string, error)</a></dd>
+			
+				
+				<dd><a href="http://localhost:8080/pkg/ehiggins98/#GetIP">func GetIP(id string) (string, error)</a></dd>
+			
+				
+				<dd><a href="http://localhost:8080/pkg/ehiggins98/#Init">func Init()</a></dd>
+			
+				
+				<dd><a href="http://localhost:8080/pkg/ehiggins98/#MakeRequest">func MakeRequest(server string, body string) *http.Request</a></dd>
+			
+				
+				<dd><a href="http://localhost:8080/pkg/ehiggins98/#Reset">func Reset(id string) error</a></dd>
+			
+				
+				<dd><a href="http://localhost:8080/pkg/ehiggins98/#TimeMillis">func TimeMillis() int64</a></dd>
+			
+			
+				
+				<dd><a href="http://localhost:8080/pkg/ehiggins98/#Data">type Data</a></dd>
+				
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:8080/src/ehiggins98/gcpinterface.go">gcpinterface.go</a>
+			
+				<a href="http://localhost:8080/src/ehiggins98/router.go">router.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		<div id="pkg-callgraph" class="toggle" style="display: none">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Internal Call Graph section">Internal call graph ▹</h2>
+		</div> <!-- .expanded -->
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Internal Call Graph section">Internal call graph ▾</h2>
+			<p>
+			  In the call graph viewer below, each node
+			  is a function belonging to this package
+			  and its children are the functions it
+			  calls—perhaps dynamically.
+			</p>
+			<p>
+			  The root nodes are the entry points of the
+			  package: functions that may be called from
+			  outside the package.
+			  There may be non-exported or anonymous
+			  functions among them if they are called
+			  dynamically from another package.
+			</p>
+			<p>
+			  Click a node to visit that function's source code.
+			  From there you can visit its callers by
+			  clicking its declaring <code>func</code>
+			  token.
+			</p>
+			<p>
+			  Functions may be omitted if they were
+			  determined to be unreachable in the
+			  particular programs or tests that were
+			  analyzed.
+			</p>
+			<!-- Zero means show all package entry points. -->
+			<ul style="margin-left: 0.5in" id="callgraph-0" class="treeview"></ul>
+		</div>
+		</div> <!-- #pkg-callgraph -->
+
+		
+		
+		
+			
+			
+			<h2 id="Forward">func <a href="http://localhost:8080/src/ehiggins98/router.go?s=1221:1273#L33">Forward</a>
+				<a class="permalink" href="http://localhost:8080/pkg/ehiggins98/#Forward">¶</a>
+			</h2>
+			<pre>func Forward(w <a href="http://localhost:8080/pkg/net/http/">http</a>.<a href="http://localhost:8080/pkg/net/http/#ResponseWriter">ResponseWriter</a>, r *<a href="http://localhost:8080/pkg/net/http/">http</a>.<a href="http://localhost:8080/pkg/net/http/#Request">Request</a>)</pre>
+			<p>
+Accepts a request from the user and forwards it to the appropriate worker.
+If the server doesn't respond, it will be reset and rebooted asychronously.
+w is the response output and r is the input request.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="GetExecutor">func <a href="http://localhost:8080/src/ehiggins98/router.go?s=461:495#L11">GetExecutor</a>
+				<a class="permalink" href="http://localhost:8080/pkg/ehiggins98/#GetExecutor">¶</a>
+			</h2>
+			<pre>func GetExecutor() (<a href="http://localhost:8080/pkg/builtin/#string">string</a>, <a href="http://localhost:8080/pkg/builtin/#error">error</a>)</pre>
+			<p>
+Gets the IP address of an available execution server from workers.
+Returns a string containing the VM's ID, or an error if no workers are available.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="GetIP">func <a href="http://localhost:8080/src/ehiggins98/gcpinterface.go?s=1727:1764#L57">GetIP</a>
+				<a class="permalink" href="http://localhost:8080/pkg/ehiggins98/#GetIP">¶</a>
+			</h2>
+			<pre>func GetIP(id <a href="http://localhost:8080/pkg/builtin/#string">string</a>) (<a href="http://localhost:8080/pkg/builtin/#string">string</a>, <a href="http://localhost:8080/pkg/builtin/#error">error</a>)</pre>
+			<p>
+Get the internal IP address of a given worker instance.
+The given id should be the name of the instance, such as "worker-1".
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="Init">func <a href="http://localhost:8080/src/ehiggins98/gcpinterface.go?s=875:886#L23">Init</a>
+				<a class="permalink" href="http://localhost:8080/pkg/ehiggins98/#Init">¶</a>
+			</h2>
+			<pre>func Init()</pre>
+			<p>
+Authenticate with Google Cloud using JWT and the existing service account.
+This gets the data from `key.json`.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="MakeRequest">func <a href="http://localhost:8080/src/ehiggins98/router.go?s=767:825#L23">MakeRequest</a>
+				<a class="permalink" href="http://localhost:8080/pkg/ehiggins98/#MakeRequest">¶</a>
+			</h2>
+			<pre>func MakeRequest(server <a href="http://localhost:8080/pkg/builtin/#string">string</a>, body <a href="http://localhost:8080/pkg/builtin/#string">string</a>) *<a href="http://localhost:8080/pkg/net/http/">http</a>.<a href="http://localhost:8080/pkg/net/http/#Request">Request</a></pre>
+			<p>
+Builds an HTTP request with properties
+</p>
+<pre>URL: http://{server}
+Method: POST
+Headers: {Content-Type: "application/json"}
+</pre>
+
+			
+			
+
+		
+			
+			
+			<h2 id="Reset">func <a href="http://localhost:8080/src/ehiggins98/gcpinterface.go?s=2656:2683#L81">Reset</a>
+				<a class="permalink" href="http://localhost:8080/pkg/ehiggins98/#Reset">¶</a>
+			</h2>
+			<pre>func Reset(id <a href="http://localhost:8080/pkg/builtin/#string">string</a>) <a href="http://localhost:8080/pkg/builtin/#error">error</a></pre>
+			<p>
+Reset a worker instance. This resets the VM to its initial state, stops the instance, and restarts it.
+The given Id is the name of the instance (for example, "worker-1").
+Returns an error if one occurs in the reset process.
+</p>
+
+			
+			
+
+		
+			
+			
+			<h2 id="TimeMillis">func <a href="http://localhost:8080/src/ehiggins98/router.go?s=213:236#L5">TimeMillis</a>
+				<a class="permalink" href="http://localhost:8080/pkg/ehiggins98/#TimeMillis">¶</a>
+			</h2>
+			<pre>func TimeMillis() <a href="http://localhost:8080/pkg/builtin/#int64">int64</a></pre>
+			<p>
+Gets the current system time in milliseconds.
+</p>
+
+			
+			
+
+		
+		
+			
+			
+			<h2 id="Data">type <a href="http://localhost:8080/src/ehiggins98/gcpinterface.go?s=436:543#L7">Data</a>
+				<a class="permalink" href="http://localhost:8080/pkg/ehiggins98/#Data">¶</a>
+			</h2>
+			<p>
+A struct used for storing the necessary data from the service account input file.
+The file contains more information, but the only information needed for authentication
+are the client email and private key.
+</p>
+
+			<pre>type Data struct {
+<span id="Data.ClientEmail"></span>    ClientEmail <a href="http://localhost:8080/pkg/builtin/#string">string</a> `json:"client_email"`
+<span id="Data.PrivateKey"></span>    PrivateKey  <a href="http://localhost:8080/pkg/builtin/#string">string</a> `json:"private_key"`
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.10.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:8080/LICENSE">BSD license</a>.<br>
+<a href="http://localhost:8080/doc/tos.html">Terms of Service</a> |
+<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+
+<!-- TODO(adonovan): load these from <head> using "defer" attribute? -->
+<script type="text/javascript" src="./go_documentation_files/jquery.js.download"></script>
+<script type="text/javascript" src="./go_documentation_files/jquery.treeview.js.download"></script>
+<script type="text/javascript" src="./go_documentation_files/jquery.treeview.edit.js.download"></script>
+
+
+<script>var goVersion = "go1.10";</script>
+<script type="text/javascript" src="./go_documentation_files/godocs.js.download"></script>
+
+
+
+
+</body></html>

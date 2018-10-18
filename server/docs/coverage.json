@@ -1,0 +1,24 @@
+{
+  "coverage": "61.53%",
+  "expectCount": 13,
+  "actualCount": 8,
+  "files": {
+    "server/executor.js": {
+      "expectCount": 11,
+      "actualCount": 8,
+      "undocumentLines": [
+        7,
+        8,
+        10
+      ]
+    },
+    "server/worker.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        10,
+        13
+      ]
+    }
+  }
+}

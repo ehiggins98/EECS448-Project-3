@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">server/executor.js | eecs448-project-3</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-executor">executor</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">server/executor.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">let {VM} = require(&apos;vm2&apos;);
+
+/**
+ * Collects console output from the VM.
+ */
+class MyConsole {
+  constructor() {
+    this.outputs = [];
+  }
+  log(val) {
+    this.outputs.push(val);
+  }
+}
+
+/**
+ * Parses parameters from either a function declaration or function declaration and body.
+ * @param {string} functionString The function string to parse.
+ * @returns An array of parameters to the function.
+ */
+function parseParameters(functionString) {
+  let params = functionString.match(/\([^\{]*\)/)[0];
+  params = params.substr(1, params.length - 2);
+  return params.split(/[, ]/);
+}
+
+/**
+ * Aggregates an array of function strings into a single code string.
+ * @param {string[]} functions The array of function strings to combine.
+ * @returns A string containing all the given functions.
+ */
+function aggregate(functions) {
+  let code = &quot;&quot;;
+  functions.forEach(f =&gt; code += f.charAt(f.length - 1) === &quot;;&quot; ? f : f + &quot;;&quot;);
+  return code;
+}
+
+/**
+ * Runs the code in a VM.
+ * @param {string} code A string representation of the code to execute. 
+ * @return {string[]} An array containing the outputs from code execution.
+ */
+function runCode(code) {
+  try {
+    let myConsole = new MyConsole();
+    const vm = new VM({
+      timeout: 5000,
+      sandbox: {
+        console: myConsole
+      }
+    });
+
+    let result = vm.run(code);
+    if (result !== undefined) {
+      myConsole.outputs.push(result);
+    }
+
+    return myConsole.outputs;
+  }
+  catch (error) {
+    console.log(error.message);
+    return [ error.message ];
+  }
+}
+
+/**
+ * Runs code raw (i.e. doesn&apos;t parse any functions to execute).
+ * @param {string[]} functions An array of function strings and code outside of functions to execute.
+ * @return {string[]} An array containing outputs from the code execution.
+ */
+function runRaw(functions) {
+  return runCode(aggregate(functions));
+}
+
+/**
+ * Parses out a function to run and executes the code
+ * @param {string[]} params The parameters supplied by the user to pass to the function.
+ * @param {functions[]} functions An array of function strings to execute.
+ * @return {string[]} An array containing outputs from the code execution.
+ */
+function runFunction(params, functions) {
+  let paramNames = parseParameters(functions[1]);
+  functions[1] = functions[1].substr(functions[1].indexOf(&quot;{&quot;)+1);
+  for (let i = 0; i &lt; paramNames.length &amp;&amp; i &lt; params.length; i++) {
+    functions[1] = `let ${paramNames[i]} = ${params[i]};` + functions[1];
+  }
+  functions[1] = `function main() {${functions[1]} main()`;
+
+  return runCode(aggregate(functions));
+}
+
+/**
+ * Parses a given string of code into functions.
+ * @param {string} code A string representation of the code to execute.
+ * @return {string[]} An array containing functions and code outside of all functions, represented as a string.
+ */
+function parseFunctions(code) {
+  let functions = [&quot;&quot;];
+  let inTopLevelFunction = false;
+  let braceCounter = 0;
+  let mainIndex = 1;
+
+  let lines = code.split(/(?&lt;=[;\n\r\{\}]\s*)/g);
+
+  for (let i = 0; i &lt; lines.length; i++) {
+    lines[i] = lines[i].trim();
+    if (lines[i].length &gt; 8 &amp;&amp; (lines[i].substr(0, 8) === &quot;function&quot;) &amp;&amp; !inTopLevelFunction &amp;&amp; braceCounter == 0) {
+      mainIndex = lines[i].length &gt; 13 &amp;&amp; lines[i].substr(9, 13) === &quot;main&quot; ? i : mainIndex;
+
+      functions.push(lines[i]);
+      inTopLevelFunction = true;
+    }
+    else if (inTopLevelFunction) {
+      functions[functions.length - 1] += lines[i];
+    }
+    else {
+      functions[0] += lines[i];
+    }
+    braceCounter += (lines[i].match(/\{/g)||[]).length;
+    braceCounter -= (lines[i].match(/\}/g)||[]).length;
+    inTopLevelFunction = inTopLevelFunction &amp;&amp; braceCounter !== 0;
+  }
+
+  if (mainIndex &gt; 1) {
+    let temp = functions[1];
+    functions[1] = functions[mainIndex];
+    functions[mainIndex] = temp;
+  }
+  return functions;
+}
+
+/**
+ * Executes code with the given parameters.
+ * @param {string[]} params The parameters supplied by the user to pass to the code.
+ * @param {string} code A string representation of the code to execute.
+ * @return {string[]} An array containing the outputs from the code execution.
+ */
+module.exports = function (params, code) {
+  let functions = parseFunctions(code);
+  if (functions[0] !== &quot;&quot;) {
+    return runRaw(functions);
+  }
+  else {
+    return runFunction(params, functions);
+  }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

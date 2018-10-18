@@ -1,0 +1,4 @@
+#Wed Oct 17 13:27:45 CDT 2018
+base.0=C\:\\Users\\joshh\\Documents\\EECS 448 Labs and Projects\\eecs_project_3\\build\\app\\intermediates\\transforms\\dexMerger\\debug\\0
+path.0=classes.dex
+renamed.0=classes.dex

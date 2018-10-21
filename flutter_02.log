@@ -1,0 +1,77 @@
+Flutter crash report; please file at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter emulators
+
+## exception
+
+NoSuchMethodError: NoSuchMethodError: The method '[]' was called on null.
+Receiver: null
+Tried calling: []("avd.ini.displayname")
+
+```
+#0      Object.noSuchMethod (dart:core/runtime/libobject_patch.dart:50:5)
+#1      AndroidEmulator.label (package:flutter_tools/src/android/android_emulator.dart:41:34)
+#2      Emulator.descriptions (package:flutter_tools/src/emulator.dart:250:18)
+#3      Emulator.printEmulators (package:flutter_tools/src/emulator.dart:275:5)
+#4      EmulatorsCommand._printEmulatorList (package:flutter_tools/src/commands/emulators.dart:115:14)
+#5      EmulatorsCommand._listEmulators (package:flutter_tools/src/commands/emulators.dart:106:7)
+<asynchronous suspension>
+#6      EmulatorsCommand.runCommand (package:flutter_tools/src/commands/emulators.dart:55:13)
+<asynchronous suspension>
+#7      FlutterCommand.verifyThenRunCommand (package:flutter_tools/src/runner/flutter_command.dart:372:18)
+#8      _asyncThenWrapperHelper.<anonymous closure> (dart:async/runtime/libasync_patch.dart:77:64)
+#9      _rootRunUnary (dart:async/zone.dart:1132:38)
+#10     _CustomZone.runUnary (dart:async/zone.dart:1029:19)
+#11     _FutureListener.handleValue (dart:async/future_impl.dart:129:18)
+#12     Future._propagateToListeners.handleValueCallback (dart:async/future_impl.dart:642:45)
+#13     Future._propagateToListeners (dart:async/future_impl.dart:671:32)
+#14     Future._complete (dart:async/future_impl.dart:476:7)
+#15     _SyncCompleter.complete (dart:async/future_impl.dart:51:12)
+#16     _AsyncAwaitCompleter.complete.<anonymous closure> (dart:async/runtime/libasync_patch.dart:33:20)
+#17     _rootRun (dart:async/zone.dart:1124:13)
+#18     _CustomZone.run (dart:async/zone.dart:1021:19)
+#19     _CustomZone.bindCallback.<anonymous closure> (dart:async/zone.dart:947:23)
+#20     _microtaskLoop (dart:async/schedule_microtask.dart:41:21)
+#21     _startMicrotaskLoop (dart:async/schedule_microtask.dart:50:5)
+#22     _runPendingImmediateCallback (dart:isolate/runtime/libisolate_patch.dart:115:13)
+#23     _RawReceivePortImpl._handleMessage (dart:isolate/runtime/libisolate_patch.dart:172:5)
+```
+
+## flutter doctor
+
+```
+[✓] Flutter (Channel beta, v0.9.4, on Mac OS X 10.13.4 17E199, locale en-US)
+    • Flutter version 0.9.4 at /Users/zkulphong/Documents/flutter
+    • Framework revision f37c235c32 (4 weeks ago), 2018-09-25 17:45:40 -0400
+    • Engine revision 74625aed32
+    • Dart version 2.1.0-dev.5.0.flutter-a2eb050044
+
+[!] Android toolchain - develop for Android devices (Android SDK 26.0.2)
+    • Android SDK at /Users/zkulphong/Library/Android/sdk
+    • Android NDK location not configured (optional; useful for native profiling support)
+    • Platform android-26, build-tools 26.0.2
+    • Java binary at: /Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home/bin/java
+    • Java version Java(TM) SE Runtime Environment (build 1.8.0_144-b01)
+    ! Some Android licenses not accepted.  To resolve this, run: flutter doctor --android-licenses
+
+[✓] iOS toolchain - develop for iOS devices (Xcode 9.4.1)
+    • Xcode at /Applications/Xcode.app/Contents/Developer
+    • Xcode 9.4.1, Build version 9F2000
+    • ios-deploy 1.9.2
+    • CocoaPods version 1.5.3
+
+[✗] Android Studio (not installed)
+    • Android Studio not found; download from https://developer.android.com/studio/index.html
+      (or visit https://flutter.io/setup/#android-setup for detailed instructions).
+
+[✓] VS Code (version 1.28.2)
+    • VS Code at /Applications/Visual Studio Code.app/Contents
+    • Flutter extension version 2.19.0
+
+[!] Connected devices
+    ! No devices available
+
+! Doctor found issues in 3 categories.
+```

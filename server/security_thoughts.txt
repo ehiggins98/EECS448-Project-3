@@ -1,0 +1,4 @@
+* Enforce maximum code size limit
+* Catch arrow functions
+* Make sure worker is actually responding with a test request before sending any actual requests to it
+  * If you send a request after the VM is mostly started but before Node is, the VM could get stuck in a metastate

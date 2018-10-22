@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\joshh\\Documents\\EECS 448 Labs and Projects\\eecs_project_3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-hr\\values-hr.xml",
+            "outputFile": "C:\\Users\\ericd\\CodeProjects\\EECS448-Project-3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-hr\\values-hr.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\joshh\\.gradle\\caches\\transforms-1\\files-1.1\\support-compat-27.1.1.aar\\175aace67cb976ac6929f8af3a246f36\\res\\values-hr\\values-hr.xml",
+                    "source": "C:\\Users\\ericd\\.gradle\\caches\\transforms-1\\files-1.1\\support-compat-27.1.1.aar\\899aa917d8bcc5e395052ae8480a3986\\res\\values-hr\\values-hr.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

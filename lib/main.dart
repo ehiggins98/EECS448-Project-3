@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 
-
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
@@ -60,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     FormData formdata = new FormData.from({
       "file": new UploadFileInfo(_image, _image.path)
     });
-    var response = await dio.post('35.208.187.194', data: formdata, options: Options(
+    var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
         method: 'POST',
         responseType: ResponseType.PLAIN // or ResponseType.JSON
     ))

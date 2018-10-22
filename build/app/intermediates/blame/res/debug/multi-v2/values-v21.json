@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\joshh\\Documents\\EECS 448 Labs and Projects\\eecs_project_3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v21\\values-v21.xml",
+            "outputFile": "C:\\Users\\ericd\\CodeProjects\\EECS448-Project-3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v21\\values-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\joshh\\.gradle\\caches\\transforms-1\\files-1.1\\support-media-compat-27.1.1.aar\\b10e61da0f611e13f2f06a860ac54995\\res\\values-v21\\values-v21.xml",
+                    "source": "C:\\Users\\ericd\\.gradle\\caches\\transforms-1\\files-1.1\\support-media-compat-27.1.1.aar\\499052c50b5b7d7558a223b970be4145\\res\\values-v21\\values-v21.xml",
                     "from": {
                         "startLines": "2,5,8,11",
                         "startColumns": "4,4,4,4",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\joshh\\.gradle\\caches\\transforms-1\\files-1.1\\support-compat-27.1.1.aar\\175aace67cb976ac6929f8af3a246f36\\res\\values-v21\\values-v21.xml",
+                    "source": "C:\\Users\\ericd\\.gradle\\caches\\transforms-1\\files-1.1\\support-compat-27.1.1.aar\\899aa917d8bcc5e395052ae8480a3986\\res\\values-v21\\values-v21.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,13",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",

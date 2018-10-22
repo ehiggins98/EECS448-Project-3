@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
 
 
 void main() => runApp(new MyApp());
@@ -50,10 +51,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future takePic() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
+
     setState(() {
       _image = image;
     });
+
+    Dio dio = new Dio();
+    FormData formdata = new FormData.from({
+      "file": new UploadFileInfo(_image, _image.path)
+    });
+    var response = await dio.post('35.208.187.194', data: formdata, options: Options(
+        method: 'POST',
+        responseType: ResponseType.PLAIN // or ResponseType.JSON
+    ))
+        .then((response) => print(response))
+        .catchError((error) => print(error));
   }
+
   Future getPic() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
@@ -75,9 +89,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: new Text(widget.title),
         centerTitle: true,
-        actions: <Widget>[
-          FlatButton(child: Icon(Icons.photo, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: getPic)
-        ],
+//        actions: <Widget>[
+//          FlatButton(child: Icon(Icons.photo, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: getPic)
+//        ],
       ),
       body: new Center(
 

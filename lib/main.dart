@@ -47,27 +47,33 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var _image;
+  var _text;
 
   Future takePic() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    var text;
 
     setState(() {
       _image = image;
+      _text = text;
     });
 
     Dio dio = new Dio();
     FormData formdata = new FormData.from({
       "file": new UploadFileInfo(_image, _image.path)
     });
-    setState(() {
 
-    });
     var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
         method: 'POST',
         responseType: ResponseType.PLAIN // or ResponseType.JSON
     ))
-        .then((response) => print(response))
+        .then((response) => setState(() {
+          _image = null;
+          _text = response.toString();}))
         .catchError((error) => print(error));
+
+    print(text);
+
     print('response is $response');
 //    final snackBar = SnackBar(content: Text('Yay! A SnackBar!'));
 //    print('showing snack bar');
@@ -102,8 +108,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: new Center(
 
-        child: _image == null
-            ? Text('No image selected.')
+        child: _image == null || _text != null
+            ? _text == null ? Text('No image selected.') : Text(_text)
             : Image.file(_image),
       ),
 

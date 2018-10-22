@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Sun Oct 21 22:35:59 CDT 2018
+#Sun Oct 21 23:32:53 CDT 2018
 4.path=flutter_assets/kernel_blob.bin
 8.set=DEX
 6.path=lib/arm64-v8a/libflutter.so

@@ -59,12 +59,20 @@ class _MyHomePageState extends State<MyHomePage> {
     FormData formdata = new FormData.from({
       "file": new UploadFileInfo(_image, _image.path)
     });
+    setState(() {
+
+    });
     var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
         method: 'POST',
         responseType: ResponseType.PLAIN // or ResponseType.JSON
     ))
         .then((response) => print(response))
         .catchError((error) => print(error));
+    print('response is $response');
+//    final snackBar = SnackBar(content: Text('Yay! A SnackBar!'));
+//    print('showing snack bar');
+
+// Find the Scaffold in the Widget tree and use it to show a SnackBar
   }
 
   Future getPic() async {

@@ -40,7 +40,6 @@ func Init() {
     },
     TokenURL: google.JWTTokenURL,
   }
-
   service, _ = compute.New(conf.Client(oauth2.NoContext))
 }
 

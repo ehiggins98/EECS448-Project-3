@@ -45,9 +45,9 @@ func Forward(w http.ResponseWriter, r *http.Request) {
 
   for true {
     if len(workers) > 0 {
-      executor, _ := getExecutor()
-      ip, _ := GetIP(executor)
-      resp, err := postClient.Do(makeRequest(ip, string(body)))
+      executor, _ := GetExecutor()
+      ip, err := GetIP(executor)
+      resp, err := postClient.Do(MakeRequest(ip, string(body)))
 
       if err == nil {
         body, _ = ioutil.ReadAll(resp.Body);
@@ -73,7 +73,7 @@ func main() {
     Timeout: timeout,
   }
   Init()
-  http.HandleFunc("/", forward)
+  http.HandleFunc("/", Forward)
   err := http.ListenAndServe(":8080", nil)
   if err != nil {
     panic(err)

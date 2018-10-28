@@ -23,7 +23,7 @@ class ColorFilter:
         # Step HSV_Threshold0:
         self.__hsv_threshold_input = source0
         (self.hsv_threshold_output) = self.__hsv_threshold(self.__hsv_threshold_input, self.__hsv_threshold_hue, self.__hsv_threshold_saturation, self.__hsv_threshold_value)
-        return self.hsv_threshold_output;
+        return self.hsv_threshold_output
 
     @staticmethod
     def __hsv_threshold(input, hue, sat, val):

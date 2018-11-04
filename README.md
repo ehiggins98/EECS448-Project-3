@@ -6,3 +6,6 @@ A new Flutter project.
 
 For help getting started with Flutter, view our online
 [documentation](https://flutter.io/).
+
+# Works Cited
+Algorithm used in preprocessing our training data https://stackoverflow.com/questions/45531074/how-to-merge-lines-after-houghlinesp

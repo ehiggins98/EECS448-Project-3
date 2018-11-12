@@ -17,8 +17,7 @@ def process_lines(image_src):
     img = cv2.imread(image_src)
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-    ret, thresh1 = cv2.threshold(gray,127,255,cv2.THRESH_BINARY)
-
+    ret, thresh1 = cv2.threshold(gray,230,255,cv2.THRESH_BINARY)
     thresh1 = cv2.bitwise_not(thresh1)
 
     edges = cv2.Canny(thresh1, threshold1=50, threshold2=200, apertureSize = 3)
@@ -61,7 +60,6 @@ def process_lines(image_src):
     img_merged_lines = cv2.imread(image_src)
     for line in merged_lines_all:
         cv2.line(img_merged_lines, (line[0][0], line[0][1]), (line[1][0],line[1][1]), (0,0,255), 6)
-
     return merged_lines_all
 
 def merge_lines_pipeline_2(lines):

@@ -1,8 +1,15 @@
 import re
+import copy
 
 """
-TODO
-Switch from literal to expression if we see an operator
+TODO:
+return statement
+console.log()
+break statement
++=, -=, *=, /=
+Allow use of new line instead of semicolon
+. operator
+Save type of token (function or variable) to improve accuracy on function calls
 """
 
 starting_chars = "[A-z$]"
@@ -10,9 +17,9 @@ non_starting_chars = starting_chars + "|\\d"
 context_headers = ['function', 'for', 'while', 'do', 'if', 'else if', 'else']
 declaration_flags = ['var', 'let', 'const']
 literal_starting_chars = '\"|\'|t|f|\d|-'
-number_characters = '\d|-|\+'
+number_characters = '\d|-|\+|\.'
 binary_operator_chars = '&|\||-|\+|\/|\*|>|<|!|='
-binary_operators = ['&&', '||', '-', '+', '/', '*', '>', '<', '>=', '<=', '==', '=', '!=']
+binary_operators = ['&&', '||', '-', '+', '/', '*', '>', '<', '>=', '<=', '==', '=', '!=', '++']
 unary_operators = "!"
 
 alphanumeric_filter = re.compile('[A-z\d]')
@@ -26,7 +33,7 @@ def literal_complete(type, current_value):
     if type == "string" and (last == '\'' or last == '"'):
         complete = current_value != ""
     if type == "bool":
-        complete = current_value in ['true', 'false']
+        complete = (current_value+last) in ['true', 'false']
 
     return complete
 
@@ -48,7 +55,7 @@ class Scope:
     def __init__(self, tokens):
         self.scopes = []
         self.scope_open = False
-        self.tokens = tokens
+        self.tokens = copy.deepcopy(tokens)
         self.current_token = ""
 
     def get_valid_characters(self):
@@ -57,31 +64,66 @@ class Scope:
             tokens += [c[len(self.current_token)] for c in declaration_flags if c.startswith(self.current_token) and len(c) > len(self.current_token)]
             tokens = set(tokens + [c[len(self.current_token)] for c in self.tokens if c.startswith(self.current_token) and len(c) > len(self.current_token)])
 
-            if 'e' in tokens:
+            if self.current_token in self.tokens:
+                tokens.add('(')
+                tokens.add('\.')
+                tokens.add('=')
+
+            if 'e' in tokens and len(self.current_token) == 0:
                 tokens.remove('e')
-            return '|'.join(tokens)
+            appended = '|}' if self.current_token == '' else ''
+            return '|'.join(tokens) + appended
         else:
             return self.scopes[len(self.scopes) - 1].get_valid_characters()
 
     def put_character(self, character):
         if not self.scope_open and character not in "};\n":
             self.current_token += character
-            if self.current_token in context_headers or self.current_token in declaration_flags or self.current_token in self.tokens:
+            if self.current_token == 'function':
                 self.scope_open = True
-                if self.current_token == 'function':
-                    self.scopes.append(Function(self.tokens))
-                elif self.current_token in declaration_flags:
-                    self.scopes.append(VariableDeclaration(self.current_token, self.tokens))
-        elif self.scope_open:
+                self.scopes.append(Function(self.tokens))
+            elif self.current_token in declaration_flags:
+                self.scope_open = True
+                self.scopes.append(VariableDeclaration(self.current_token, self.tokens))
+            elif self.current_token in ['if', 'elseif']:
+                self.scope_open = True
+                self.scopes.append(Conditional(self.current_token, self.tokens))
+            elif re.compile('else[^i]').match(self.current_token) != None:
+                self.scope_open = True
+                cond = Conditional('else', self.tokens)
+                cond.put_character(self.current_token[len(self.current_token)-1])
+                self.current_token = self.current_token[:len(self.current_token)-1]
+                self.scopes.append(cond)
+            elif self.current_token == 'while':
+                self.scope_open = True
+                self.scopes.append(WhileLoop(self.tokens))
+            elif self.current_token == 'for':
+                self.scope_open = True
+                self.scopes.append(ForLoop(self.tokens))
+            elif self.current_token[:len(self.current_token)-1] in self.tokens:
+                self.scope_open = True
+                if self.current_token[len(self.current_token)-1] == '=':
+                    self.scopes.append(VariableDeclaration("", self.tokens))
+                    for c in self.current_token:
+                        self.scopes[len(self.scopes)-1].put_character(c)
+                elif self.current_token[len(self.current_token)-1] == '(':
+                    self.scopes.append(FunctionCall(self.tokens))
+                    for c in self.current_token:
+                        self.scopes[len(self.scopes)-1].put_character(c)
+
+        elif self.scope_open and (character != "}" or character == '}' and self.current_token not in declaration_flags):
             self.scope_open = not self.scopes[len(self.scopes) - 1].put_character(character)
+
             if not self.scope_open:
+                if self.current_token in declaration_flags:
+                    self.tokens.append(self.scopes[len(self.scopes) - 1].name)
                 self.current_token = ""
         elif character == '}':
             return True
         return False
 
     def to_string(self):
-        return ';\n'.join([c.to_string() for c in self.scopes])
+        return ';\n'.join([c.to_string() for c in self.scopes]).replace('};', '}')
 
 class VariableDeclaration:
     def __init__(self, type, tokens):
@@ -95,15 +137,9 @@ class VariableDeclaration:
         if self.name == "":
             return starting_chars
         elif not self.named and self.name != "":
-            return non_starting_chars + '|=|.'
-        elif self.named and self.value == None:
-            return starting_chars + '|' + literal_starting_chars
-        else:
-            if isinstance(self.value, str):
-                valid = set([c[len(self.value)] for c in self.tokens if c.startswith(self.value)] + [c[len(self.value)] for c in ['true', 'false'] if c.startswith(self.value)])
-                return '|'.join(valid)
-            else:
-                return self.value.get_valid_characters()
+            return non_starting_chars + '|='
+        elif self.value != None:
+            return self.value.get_valid_characters()
 
     def put_character(self, character):
         if character in ";\n" and self.value_is_complete:
@@ -112,71 +148,28 @@ class VariableDeclaration:
             self.name += character
         elif not self.named and character == '=':
             self.named = True
-        elif self.value == None:
-            if re.compile(literal_starting_chars).match(character) and not self.could_be_token(character):
-                self.value = Expression(self.tokens)
-                self.value.put_character(character)
-            else:
-                self.value = character
-        elif isinstance(self.value, Expression):
+            self.value = Expression(self.tokens)
+        elif self.named:
             self.value.put_character(character)
-        else:
-            temp = self.value + character
-            if not self.could_be_token(temp) and ('true'.startswith(temp) or 'false'.startswith(temp)):
-                self.value = Expression(self.tokens)
-                for c in temp:
-                    self.value.put_character(c)
-            else:
-                self.value = temp
 
         return False
 
     def to_string(self):
         value_string = self.value if isinstance(self.value, str) else self.value.to_string()
-        return self.type + " " + self.name + " = " + value_string + ';'
+        type_string = self.type + " " if len(self.type) > 0 else ""
+        return type_string + self.name + " = " + value_string
 
     def could_be_token(self, str):
         return any([t.startswith(str) for t in self.tokens])
 
     def value_is_complete(self):
-        if isinstance(self.value, str):
-            return self.value != ""
-        else:
-            return self.value.complete
-
-class Literal:
-    def __init__(self, tokens):
-        self.value = ""
-        self.type = None
-        self.tokens = tokens
-        self.complete = False
-
-    def get_valid_characters(self):
-        if self.type == None:
-            return literal_starting_chars
-        elif self.type == "number":
-            return number_characters
-        elif self.type == "bool":
-            return '|'.join([c[len(self.value)] for c in ['true', 'false'] if c.startswith(self.value)])
-        elif self.type == "string":
-            return '\'|"' if self.value == "" else "."
-
-    def put_character(self, character):
-        if self.value == "":
-            self.type = get_literal_type(character)
-
-        self.complete = literal_complete(self.type, self.value + character)
-
-        self.value += "" if character in ";\n" and self.complete else character
-        return self.complete and character in ";\n"
-
-    def to_string(self):
-        return self.value
+        return self.value.complete
 
 class Function:
     def __init__(self, tokens):
         self.params = []
-        self.tokens = tokens
+        self.tokens = copy.deepcopy(tokens)
+        self.parent_tokens = tokens
         self.name = ""
         self.body = None
         self.named = False
@@ -204,6 +197,8 @@ class Function:
         if not self.named:
             if character == '(':
                 self.named = True
+                self.tokens.append(self.name)
+                self.parent_tokens.append(self.name)
             else:
                 self.name += character
         elif not self.parameterized and character != ')':
@@ -216,6 +211,7 @@ class Function:
                 self.params[len(self.params) - 1] += character
         elif not self.parameterized and character == ')':
             self.parameterized = True
+            self.tokens += self.params
         elif self.parameterized and self.body == None and character == '{':
             self.body = Scope(self.tokens)
         elif self.parameterized and self.body != None:
@@ -226,7 +222,7 @@ class Function:
     def to_string(self):
         params = ''.join(self.params)
         body = "" if self.body == None else self.body.to_string()
-        return 'function ' + self.name + "(" + params + '){' + body + '}'
+        return 'function ' + self.name + "(" + params + '){\n' + body + '\n}'
 
 class Expression:
     def __init__(self, tokens):
@@ -240,7 +236,7 @@ class Expression:
         if last == '!':
             return literal_starting_chars + self.get_token_chars() + "|(|="
         if last == '(':
-            return literal_starting_chars + self.get_token_chars() + '|!'
+            return literal_starting_chars + self.get_token_chars() + '|!|('
         if last == ')':
             return binary_operator_chars
 
@@ -250,7 +246,10 @@ class Expression:
             return literal_starting_chars + "|(|!" + possible_operators + self.get_token_chars()
 
         if self.symbol_complete() and self.current_symbol not in binary_operators:
-            return binary_operator_chars + "|)"
+            append = ""
+            if get_literal_type(self.current_symbol[0]) == 'number':
+                append = "|\."
+            return binary_operator_chars + "|)|;" + append
 
         if not self.symbol_complete() and self.current_symbol not in binary_operator_chars:
             result = self.get_literal_chars() + self.get_token_chars()
@@ -264,10 +263,195 @@ class Expression:
 
         self.value += character
         self.current_symbol += character
-        return self.symbol_complete()
+        return self.symbol_complete() and self.current_symbol not in binary_operator_chars
 
     def to_string(self):
         return self.value
+
+    def get_token_chars(self):
+        token = filter_alphanumeric(self.current_symbol)
+        token_chars = '|'.join(set([t[len(token)] for t in self.tokens if len(t) > len(token) and t.startswith(token)]))
+
+        if token_chars != "":
+            token_chars = "|" + token_chars
+        return token_chars
+
+    def get_literal_chars(self):
+        if len(self.current_symbol) > 0 and self.current_symbol[0] in '\'"':
+            return '.'
+        if any([c.startswith(self.current_symbol) for c in ['true', 'false']]):
+            result = [c[len(self.current_symbol)] for c in ['true', 'false'] if c.startswith(self.current_symbol) and len(c) > len(self.current_symbol)]
+            return result[0] if len(result) > 0 else ""
+        if re.compile(number_characters).match(self.current_symbol):
+            return number_characters
+
+        return ""
+
+    def complete(self):
+        return self.symbol_complete() and self.current_symbol not in binary_operator_chars
+
+    def empty(self):
+        return len(self.value) == 0
+
+    def symbol_complete(self):
+        complete = len(self.current_symbol) > 0 and literal_complete(get_literal_type(self.current_symbol[0]), self.current_symbol)
+        complete = complete or self.current_symbol in self.tokens
+        complete = complete or self.current_symbol in binary_operators
+        complete = complete or self.current_symbol == '!' or self.current_symbol == ';' or self.current_symbol == ')'
+        return complete
+
+class Conditional:
+    def __init__(self, type, tokens):
+        self.tokens = copy.deepcopy(tokens)
+        self.condition = Expression(tokens)
+        self.started = False
+        self.condition_open = False
+        self.body_open = False
+        self.body = Scope(tokens)
+        self.type = type
+        self.last_char = ""
+
+    def get_valid_characters(self):
+        if not self.condition_open and not self.body_open:
+            return '('
+        if self.condition_open:
+            appended = "|{" if self.last_char == ')' else ""
+            return self.condition.get_valid_characters() + appended
+        if self.body_open:
+            return self.body.get_valid_characters()
+
+    def put_character(self, character):
+        if (not self.condition_open and not self.body_open and character == "(") or (self.type == 'else' and not self.started):
+            self.started = True
+            self.condition_open = self.type != 'else'
+            self.body_open = self.type == 'else'
+        elif self.condition_open:
+            if character == '\n' or character == '{':
+                self.condition_open = False
+                self.body_open = True
+            else:
+                self.condition.put_character(character)
+        elif self.body_open:
+            self.body_open = not self.body.put_character(character)
+        self.last_char = character
+        return not self.body_open and not self.condition_open and self.started
+
+    def to_string(self):
+        token = 'else if(' if self.type == 'elseif' else self.type
+        if token == 'if': token += '('
+        return token + self.condition.to_string() + '{\n' + self.body.to_string() + '\n}'
+
+class WhileLoop:
+    def __init__(self, tokens):
+        self.tokens = copy.deepcopy(tokens)
+        self.condition = Expression(self.tokens)
+        self.body = Scope(self.tokens)
+        self.condition_open = False
+        self.body_open = False
+        self.started = False
+        self.last_char = ""
+
+    def get_valid_characters(self):
+        if not self.condition_open and not self.body_open and not self.started:
+            return '('
+        if self.condition_open:
+            appended = "|{" if self.last_char == ')' else ""
+            return self.condition.get_valid_characters() + appended
+        if self.body_open:
+            return self.body.get_valid_characters()
+
+    def put_character(self, character):
+        if not self.condition_open and not self.started and character == '(':
+            self.condition_open = True
+            self.started = True
+        elif self.condition_open:
+            if character == '{':
+                self.condition_open = False
+                self.body_open = True
+            else:
+                self.condition.put_character(character)
+        elif self.body_open:
+            self.body_open = not self.body.put_character(character)
+        self.last_char = character
+        return not self.body_open and not self.condition_open and self.started
+
+    def to_string(self):
+        return 'while(' + self.condition.to_string() + '{\n' + self.body.to_string() + '\n}'
+
+class ForLoop:
+    def __init__(self, tokens):
+        self.tokens = copy.deepcopy(tokens)
+        self.body_open = False
+        self.started = False
+        self.header_complete = False
+
+        self.initializer = None
+        self.condition = None
+        self.increment = None
+        self.body = None
+
+    def get_valid_characters(self):
+        if not self.initializer and not self.condition and not self.increment and not self.body and not self.started:
+            return '('
+        elif self.header_complete and not self.body:
+            return '{|\n'
+        elif self.initializer != None and not self.condition:
+            if isinstance(self.initializer, str):
+                chars = [c[len(self.initializer)] for c in ['var', 'let'] if c.startswith(self.initializer) and len(c) > len(self.initializer)]
+                name, flag = self.name_and_flag(self.initializer)
+                chars += [c[len(self.initializer)] for c in self.tokens if c.startswith(name) and len(c) > len(self.initializer)]
+                return '|'.join(set(chars))
+            elif isinstance(self.initializer, Expression):
+                return self.initializer.get_valid_characters() + ';'
+        elif self.condition and not self.increment:
+            return self.condition.get_valid_characters()
+        elif self.increment and not self.body:
+            return self.increment.get_valid_characters()
+        elif self.body:
+            return self.body.get_valid_characters()
+
+    def put_character(self, character):
+        if not self.initializer and not self.condition and not self.increment and not self.body and not self.started and character == '(':
+            self.initializer = ""
+            self.started = True
+        elif self.header_complete and character == '{':
+            self.body = Scope(self.tokens)
+        elif self.initializer != None and not self.condition:
+            if isinstance(self.initializer, str):
+                self.initializer += character
+                if self.could_be_token(self.initializer) and not self.could_be_declaration(self.initializer):
+                    temp = self.initializer
+                    self.initializer = VariableDeclaration("", self.tokens)
+                    for c in temp:
+                        self.initializer.put_character(c)
+                elif not self.could_be_token(self.initializer) and self.could_be_declaration(self.initializer) and (self.initializer.startswith('var') or self.initializer.startswith('let')):
+                    name, flag = self.name_and_flag(self.initializer)
+                    self.initializer = VariableDeclaration(flag, self.tokens)
+                    for c in name:
+                        self.initializer.put_character(c)
+            elif isinstance(self.initializer, VariableDeclaration):
+                if self.initializer.put_character(character) and character == ';':
+                    self.tokens.append(self.initializer.name)
+                    self.condition = Expression(self.tokens)
+        elif self.condition and not self.increment:
+            expr_complete = self.condition.put_character(character)
+            if expr_complete and character == ';':
+                self.increment = Expression(self.tokens)
+        elif self.increment and not self.body:
+            self.header_complete = self.increment.put_character(character) and character == ')'
+        elif self.body:
+            return self.body.put_character(character)
+
+        return False;
+
+    def to_string(self):
+        return 'for(' + self.initializer.to_string() + '; ' + self.condition.to_string() + ' ' + self.increment.to_string() + '{\n' + self.body.to_string() + '\n}'
+
+    def could_be_token(self, str):
+        return any([c.startswith(str) for c in self.tokens] + [str.startswith(c) for c in self.tokens])
+
+    def could_be_declaration(self, str):
+        return any([c.startswith(str) for c in declaration_flags] + [str.startswith(c) for c in declaration_flags])
 
     def get_token_chars(self):
         token = filter_alphanumeric(self.current_symbol)
@@ -277,21 +461,52 @@ class Expression:
             token_chars = "|" + token_chars
         return token_chars
 
-    def get_literal_chars(self):
-        symbol = filter_alphanumeric(self.current_symbol)
+    def name_and_flag(self, str):
+        for d in declaration_flags:
+            if str.startswith(d):
+                return str[len(d):], d
+            elif d.startswith(str):
+                return "", d
+        for t in self.tokens:
+            if str.startswith(t):
+                return t, ""
 
-        if self.current_symbol in '\'"':
-            return '.'
-        if any([c.startswith(symbol) for c in ['true', 'false']]):
-            return [c[len(symbol)] for c in ['true', 'false'] if c.startswith(symbol) and len(c) > len(symbol)][0]
-        if re.compile(number_characters).match(symbol):
-            return number_characters
+class FunctionCall:
+    def __init__(self, tokens):
+        self.tokens = copy.deepcopy(tokens)
+        self.name = ""
+        self.params = []
+        self.comma = False
 
-        return ""
+    def get_valid_characters(self):
+        if not self.params:
+            result = set([c[len(self.name)] for c in self.tokens if c.startswith(self.name) and len(c) > len(self.name)])
 
-    def symbol_complete(self):
-        complete = len(self.current_symbol) > 0 and literal_complete(get_literal_type(self.current_symbol[0]), self.current_symbol)
-        complete = complete or any([t == self.current_symbol for t in self.tokens])
-        complete = complete or self.current_symbol in binary_operators
-        complete = complete or self.current_symbol == '!'
-        return complete
+            if len([c for c in self.tokens if c == self.name]) > 0:
+                result.add('(')
+            return '|'.join(result)
+        else:
+            result = self.params[len(self.params)-1].get_valid_characters()
+            appended = ''
+            if ',' not in result and self.params[len(self.params)-1].complete():
+                appended += '|,'
+            if ')' not in result and (self.params[len(self.params)-1].complete() or len(self.params) == 1 and self.params[0].empty()):
+                appended += '|)'
+            return result + appended
+
+    def put_character(self, character):
+        self.comma = False
+        if not self.params and character != '(':
+            self.name += character
+        elif not self.params and character == '(' or self.params and character == ',' and self.params[len(self.params)-1].complete():
+            self.params.append(Expression(self.tokens))
+            self.comma = True
+        elif self.params[len(self.params)-1].complete() and character == ';':
+            return True;
+        elif self.params:
+            self.params[len(self.params)-1].put_character(character)
+
+        return False;
+
+    def to_string(self):
+        return self.name + '(' + ','.join([p.to_string() for p in self.params]) + ');'

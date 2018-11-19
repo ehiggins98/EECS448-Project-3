@@ -1,6 +1,6 @@
 import context
 
-top_level = context.Scope([])
+top_level = context.Scope({})
 
 while True:
     print(top_level.get_valid_characters())

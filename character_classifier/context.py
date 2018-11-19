@@ -3,7 +3,7 @@ import copy
 
 """
 TODO:
-+=, -=, *=, /=
++=, -=, *=, /=, %, ++
 Allow use of new line instead of semicolon
 Save type of token (function or variable) to improve accuracy on function calls
 Add semicolon to last line of scope
@@ -15,13 +15,13 @@ Object literals
 
 starting_chars = "[A-z$]"
 non_starting_chars = starting_chars + "|\\d"
-context_headers = ['function', 'for', 'while', 'do', 'if', 'else if', 'else']
+context_headers = ['function', 'for', 'while', 'if', 'else if', 'else']
 declaration_flags = ['var', 'let', 'const']
 auxiliary_flags = ['return', 'break']
 literal_starting_chars = '\"|\'|t|f|\d|-'
 number_characters = '\d|-|\+|\.'
-binary_operator_chars = '&|\||-|\+|\/|\*|>|<|!|='
-binary_operators = ['&&', '||', '-', '+', '/', '*', '>', '<', '>=', '<=', '==', '=', '!=', '++']
+binary_operator_chars = '&|\||-|\+|\/|\*|>|<|!|=|%'
+binary_operators = ['&&', '||', '-', '+', '/', '*', '>', '<', '>=', '<=', '==', '=', '!=', '%']
 unary_operators = "!"
 
 alphanumeric_filter = re.compile('[A-z\d]')
@@ -87,9 +87,9 @@ class Scope:
                     elif full:
                         tokens.add('=')
                         tokens.add('\.')
-                        tokens.add('(')
+                        tokens.add('\(')
                     else:
-                        return non_starting_chars + '|=|\.|('
+                        return non_starting_chars + '|=|\.|\('
 
                     return '|'.join(tokens)
             else:
@@ -99,13 +99,13 @@ class Scope:
                 tokens = set(tokens + [c[len(self.current_token)] for c in self.token_dict.keys() if c.startswith(self.current_token) and len(c) > len(self.current_token)])
 
                 if self.current_token in self.token_dict.keys():
-                    tokens.add('(')
+                    tokens.add('\(')
                     tokens.add('\.')
                     tokens.add('=')
 
                 if 'e' in tokens and len(self.current_token) == 0:
                     tokens.remove('e')
-                appended = '|}' if self.current_token == '' else ''
+                appended = '|\}' if self.current_token == '' else ''
                 return '|'.join(tokens) + appended
         else:
             return self.scopes[len(self.scopes) - 1].get_valid_characters()
@@ -229,19 +229,19 @@ class Function:
 
     def get_valid_characters(self):
         if not self.named:
-            return starting_chars if self.name == "" else non_starting_chars + "|("
+            return starting_chars if self.name == "" else non_starting_chars + "|\("
         if not self.parameterized:
             last_param = None if len(self.params) == 0 else self.params[len(self.params)-1]
             last_param = None if last_param == None or [len(last_param) - 1] == ',' else last_param
 
             if last_param == None:
-                return starting_chars + "|)"
+                return starting_chars + "|\)"
             if last_param != None and last_param[len(last_param) - 1] != ',':
-                return non_starting_chars + "|,|)"
+                return non_starting_chars + "|,|\)"
             if last_param != None:
                 return starting_chars
         if self.parameterized and self.body == None:
-            return '{'
+            return '\{'
 
         return self.body.get_valid_characters()
 
@@ -288,22 +288,23 @@ class Expression:
         last = "" if len(self.value) == 0 else self.value[len(self.value)-1]
 
         if last == '!':
-            return literal_starting_chars + self.get_token_chars() + "|(|="
+            return literal_starting_chars + self.get_token_chars() + "|\(|="
         if last == '(':
-            return literal_starting_chars + self.get_token_chars() + '|!|('
+            return literal_starting_chars + self.get_token_chars() + '|!|\('
         if last == ')':
             return binary_operator_chars
 
         if last == "" or last in binary_operator_chars:
             possible_operators = '|'.join(set([c[1] for c in binary_operators if c.startswith(last) and len(c) > 1 and len(last) > 0]))
+            possible_operators = possible_operators.replace('+', '\+')
             if len(possible_operators) > 0: possible_operators = '|' + possible_operators
-            return literal_starting_chars + "|(|!" + possible_operators + self.get_token_chars()
+            return literal_starting_chars + "|\(|!" + possible_operators + self.get_token_chars()
 
         if self.symbol_complete() and self.current_symbol not in binary_operators:
             append = ""
             if get_literal_type(self.current_symbol[0]) == 'number':
                 append = "|\."
-            return binary_operator_chars + "|)|;" + append
+            return binary_operator_chars + "|\)|;" + append
 
         if not self.symbol_complete() and self.current_symbol not in binary_operator_chars:
             result = self.get_literal_chars()
@@ -368,9 +369,9 @@ class Conditional:
 
     def get_valid_characters(self):
         if not self.condition_open and not self.body_open:
-            return '('
+            return '\('
         if self.condition_open:
-            appended = "|{" if self.last_char == ')' else ""
+            appended = "|\{" if self.last_char == ')' else ""
             return self.condition.get_valid_characters() + appended
         if self.body_open:
             return self.body.get_valid_characters()
@@ -408,9 +409,9 @@ class WhileLoop:
 
     def get_valid_characters(self):
         if not self.condition_open and not self.body_open and not self.started:
-            return '('
+            return '\('
         if self.condition_open:
-            appended = "|{" if self.last_char == ')' else ""
+            appended = "|\{" if self.last_char == ')' else ""
             return self.condition.get_valid_characters() + appended
         if self.body_open:
             return self.body.get_valid_characters()
@@ -447,17 +448,17 @@ class ForLoop:
 
     def get_valid_characters(self):
         if not self.initializer and not self.condition and not self.increment and not self.body and not self.started:
-            return '('
+            return '\('
         elif self.header_complete and not self.body:
-            return '{|\n'
+            return '\{|\n'
         elif self.initializer != None and not self.condition:
             if isinstance(self.initializer, str):
                 chars = [c[len(self.initializer)] for c in ['var', 'let'] if c.startswith(self.initializer) and len(c) > len(self.initializer)]
                 name, flag = self.name_and_flag(self.initializer)
-                chars += [c[len(self.initializer)] for c in self.token_dict.keys() if c.startswith(name) and len(c) > len(self.initializer)]
+                chars += [c[len(name)] for c in self.token_dict.keys() if c.startswith(name) and len(c) > len(self.initializer) and len(name) > 0]
                 return '|'.join(set(chars))
-            elif isinstance(self.initializer, Expression):
-                return self.initializer.get_valid_characters() + ';'
+            elif isinstance(self.initializer, VariableDeclaration):
+                return self.initializer.get_valid_characters()
         elif self.condition and not self.increment:
             return self.condition.get_valid_characters()
         elif self.increment and not self.body:
@@ -538,7 +539,7 @@ class FunctionCall:
             result = set([c[len(self.name)] for c in self.token_dict.keys() if c.startswith(self.name) and len(c) > len(self.name)])
 
             if len([c for c in self.token_dict.keys() if c == self.name]) > 0:
-                result.add('(')
+                result.add('\(')
             return '|'.join(result)
         else:
             result = self.params[len(self.params)-1].get_valid_characters()
@@ -546,7 +547,7 @@ class FunctionCall:
             if ',' not in result and self.params[len(self.params)-1].complete():
                 appended += '|,'
             if ')' not in result and (self.params[len(self.params)-1].complete() or len(self.params) == 1 and self.params[0].empty()):
-                appended += '|)'
+                appended += '|\)'
             return result + appended
 
     def put_character(self, character):

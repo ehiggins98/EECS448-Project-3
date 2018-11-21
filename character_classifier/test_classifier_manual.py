@@ -1,4 +1,4 @@
-from .. import classifier
+import classifier
 import numpy as np
 import context
 import re

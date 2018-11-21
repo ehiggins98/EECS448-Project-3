@@ -3,8 +3,7 @@ import copy
 
 """
 TODO:
-+=, -=, *=, /=, %, ++
-Allow use of new line instead of semicolon
++=, -=, *=, /=
 Save type of token (function or variable) to improve accuracy on function calls
 Add semicolon to last line of scope
 Make it a bit more resilient to invalid tokens in expressions and such
@@ -114,7 +113,7 @@ class Scope:
         else:
             valid = self.scopes[len(self.scopes) - 1].get_valid_characters()
             if isinstance(self.scopes[len(self.scopes) - 1], Expression) and self.scopes[len(self.scopes) - 1].complete():
-                valid += '|;'
+                valid += '|;|\n'
             return valid
 
     def put_character(self, character):
@@ -190,7 +189,7 @@ class VariableDeclaration:
     def __init__(self, type, token_dict):
         self.token_dict = token_dict
         self.type = type
-        self.name = [""];
+        self.name = [""]
         self.value = None
         self.named = False
 
@@ -317,8 +316,7 @@ class Expression:
             return literal_starting_chars + "|\(|!" + possible_operators + self.get_token_chars()
 
         if self.symbol_complete() and self.current_symbol not in binary_operators:
-            append = "|\."
-            return binary_operator_chars + "|\)|;" + append
+            return binary_operator_chars + "|\)|;|\n|\."
 
         if not self.symbol_complete() and self.current_symbol not in binary_operator_chars:
             result = self.get_literal_chars()
@@ -374,7 +372,7 @@ class Expression:
         complete = len(self.current_symbol) > 0 and literal_complete(get_literal_type(self.current_symbol[0]), self.current_symbol)
         complete = complete or self.current_symbol in self.token_dict.keys()
         complete = complete or self.current_symbol in binary_operators
-        complete = complete or self.current_symbol == '!' or self.current_symbol == ';' or self.current_symbol == ')'
+        complete = complete or self.current_symbol == '!' or self.current_symbol in ';\n' or self.current_symbol == ')'
         complete = complete or ((last_two == '++' or last_two == '--') and third_to_last not in binary_operator_chars)
         return complete
 
@@ -509,19 +507,19 @@ class ForLoop:
                     for c in name:
                         self.initializer.put_character(c)
             elif isinstance(self.initializer, VariableDeclaration):
-                if self.initializer.put_character(character) and character == ';':
+                if self.initializer.put_character(character) and character in ';\n':
                     self.token_dict['.'.join(self.initializer.name)] = {}
                     self.condition = Expression(self.token_dict, False)
         elif self.condition and not self.increment:
             expr_complete = self.condition.put_character(character)
-            if expr_complete and character == ';':
+            if expr_complete and character in ';\n':
                 self.increment = Expression(self.token_dict, False)
         elif self.increment and not self.body:
             self.header_complete = self.increment.put_character(character) and character == ')'
         elif self.body:
             return self.body.put_character(character)
 
-        return False;
+        return False
 
     def to_string(self):
         return 'for(' + self.initializer.to_string() + '; ' + self.condition.to_string() + ' ' + self.increment.to_string() + '{\n' + self.body.to_string() + '\n}'
@@ -582,12 +580,12 @@ class FunctionCall:
         elif not self.params and character == '(' or self.params and character == ',' and self.params[len(self.params)-1].complete():
             self.params.append(Expression(self.token_dict, False))
             self.comma = True
-        elif self.params[len(self.params)-1].complete() and character == ';':
+        elif self.params[len(self.params)-1].complete() and character in ';\n':
             return True
         elif self.params:
             self.params[len(self.params)-1].put_character(character)
 
-        return False;
+        return False
 
     def to_string(self):
         return self.name + '(' + ', '.join([p.to_string() for p in self.params]) + ';'
@@ -595,7 +593,7 @@ class FunctionCall:
 class AuxiliaryFlag:
     def __init__(self, type, token_dict):
         self.type = type
-        self.value = Expression(token_dict, False) if type == 'return' else None;
+        self.value = Expression(token_dict, False) if type == 'return' else None
 
     def get_valid_characters(self):
         if not self.value:
@@ -611,10 +609,10 @@ class AuxiliaryFlag:
 
     def put_character(self, character):
         if character in ';\n' and (not self.value or self.value.complete() or self.value.empty()):
-            return True;
+            return True
         else:
             self.value.put_character(character)
-            return False;
+            return False
 
     def to_string(self):
         str = self.value.to_string() if self.value else ''

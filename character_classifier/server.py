@@ -46,17 +46,22 @@ def process_image():
 
     # Process image into individual characters @not Zak
     # I'm going to assume it's contained in an array of 32x32 grayscale images called char_images
+    # @not Zak if the character is a new line, just put None in the array of character images
     char_images = []
     for c_img in char_images:
-        # this is a 93-dimensional vector of probabilities for each class
-        probabilities = classifier.predict(c_img)
-        valid = parser.get_valid_characters()
-        valid = list_from_regex(valid)
+        if not c_img:
+            parser.put_character('\n')
 
-        # this is a vector of probabilities including only the syntactically-valid characters at this point in the code
-        valid_prob = np.take(probabilities, valid)
-        char = valid[np.argmax(valid_prob)]
-        char = decode(char)
-        parser.put_character(char)
+        else:
+            # this is a 93-dimensional vector of probabilities for each class
+            probabilities = classifier.predict(c_img)
+            valid = parser.get_valid_characters()
+            valid = list_from_regex(valid)
+
+            # this is a vector of probabilities including only the syntactically-valid characters at this point in the code
+            valid_prob = np.take(probabilities, valid)
+            char = valid[np.argmax(valid_prob)]
+            char = decode(char)
+            parser.put_character(char)
 
     return parser.to_string()

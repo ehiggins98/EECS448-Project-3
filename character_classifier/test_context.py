@@ -285,7 +285,7 @@ class TestVariableDeclaration(unittest.TestCase):
     def test_should_return_correct_characters_after_starting_num_value(self):
         self.put_string('a=5')
         valid = self.declaration.get_valid_characters()
-        self.assertEqual("&|\||-|\+|\/|\*|>|<|!|=|%|\)|;|\.", valid)
+        self.assertEqual("&|\||-|\+|\/|\*|>|<|!|=|%|\)|;|\n|\.", valid)
 
     def test_should_return_correct_characters_after_starting_string_literal(self):
         self.put_string('a="')
@@ -358,7 +358,7 @@ class TestExpression(unittest.TestCase):
         exp.put_character('p')
         exp.put_character('f')
         valid = exp.get_valid_characters()
-        self.assertEqual(binary_operator_chars + '|\)|;|\.', valid)
+        self.assertEqual(binary_operator_chars + '|\)|;|\n|\.', valid)
 
     def test_should_require_literal_token_or_unary_after_open_paren(self):
         exp = context.Expression({'coolidge': {}}, False)
@@ -389,7 +389,7 @@ class TestExpression(unittest.TestCase):
         exp = context.Expression({'teddyyyyy': {}}, False)
         exp.put_character('5')
         valid = exp.get_valid_characters()
-        self.assertEqual('&|\||-|\+|\/|\*|>|<|!|=|%|\)|;|\.', valid)
+        self.assertEqual('&|\||-|\+|\/|\*|>|<|!|=|%|\)|;|\n|\.', valid)
 
     def test_should_require_any_char_in_string_literal(self):
         self.put_string('"')
@@ -404,7 +404,7 @@ class TestExpression(unittest.TestCase):
     def test_should_require_operator_after_string_literal(self):
         self.put_string('"abc"')
         valid = self.exp.get_valid_characters()
-        self.assertEqual(binary_operator_chars + '|\)|;|\.', valid)
+        self.assertEqual(binary_operator_chars + '|\)|;|\n|\.', valid)
 
     def test_should_be_able_to_print_to_string(self):
         value = "'abc' == 5 || 32 == 7"
@@ -422,6 +422,12 @@ class TestExpression(unittest.TestCase):
     def test_should_allow_plus_after_first_plus(self):
         self.put_string('x+')
         self.assertTrue('+' in self.exp.get_valid_characters())
+
+    def test_should_be_able_to_use_mod_operator(self):
+        exp = context.Expression({'x': {}}, False)
+        exp.put_character('x')
+        valid = exp.get_valid_characters()
+        self.assertTrue('%' in valid)
 
     def put_string(self, str):
         for c in str:

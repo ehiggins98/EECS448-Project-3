@@ -5,7 +5,6 @@ import copy
 TODO:
 +=, -=, *=, /=
 Save type of token (function or variable) to improve accuracy on function calls
-Add semicolon to last line of scope
 Make it a bit more resilient to invalid tokens in expressions and such
 Setting properties to functions
 Array literals
@@ -183,7 +182,10 @@ class Scope:
         return False
 
     def to_string(self):
-        return ';\n'.join([c.to_string() for c in self.scopes]).replace('};', '}')
+        result = ';\n'.join([c.to_string() for c in self.scopes]).replace('};', '}')
+        if len(result) > 0 and result[len(result)-1] not in ';}':
+            result += ';'
+        return result
 
 class VariableDeclaration:
     def __init__(self, type, token_dict):

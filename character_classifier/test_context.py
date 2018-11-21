@@ -109,7 +109,7 @@ class TestScope(unittest.TestCase):
 
     def test_should_be_able_to_use_if_else(self):
         self.put_string('if(5==5){varx=7;}elseif(6==6){varx=8;}else{varx=3;}')
-        self.assertEqual('if(5==5){\nvar x = 7\n}\nelse if(6==6){\nvar x = 8\n}\nelse{\nvar x = 3\n}', self.scope.to_string())
+        self.assertEqual('if(5==5){\nvar x = 7;\n}\nelse if(6==6){\nvar x = 8;\n}\nelse{\nvar x = 3;\n}', self.scope.to_string())
 
     def test_should_allow_close_brace_at_end(self):
         self.put_string('varx=5;')
@@ -136,7 +136,7 @@ class TestScope(unittest.TestCase):
 
         self.put_string('lety=3;}for(z=1;z<5;z++){letu=3;}')
         str = self.scope.to_string()
-        self.assertEqual('let z = 8;\nfor(let x = 7; x<5; x++){\nlet y = 3\n}\nfor(z = 1; z<5; z++){\nlet u = 3\n}', str)
+        self.assertEqual('let z = 8;\nfor(let x = 7; x<5; x++){\nlet y = 3;\n}\nfor(z = 1; z<5; z++){\nlet u = 3;\n}', str)
 
     def test_tokens_should_not_get_passed_up_scope(self):
         self.put_string('if(true){letx=5;}')
@@ -167,7 +167,7 @@ class TestScope(unittest.TestCase):
 
         self.put_string('rn;}')
         result = self.scope.to_string()
-        self.assertEqual('function abc(a, b, c){\nreturn\n}', result)
+        self.assertEqual('function abc(a, b, c){\nreturn;\n}', result)
 
     def test_should_be_able_to_use_break(self):
         self.put_string('for(letx=0;x<5;x++){lety=8;brea')
@@ -176,7 +176,7 @@ class TestScope(unittest.TestCase):
 
         self.put_string('k;}')
         result = self.scope.to_string()
-        self.assertEqual('for(let x = 0; x<5; x++){\nlet y = 8;\nbreak\n}', result)
+        self.assertEqual('for(let x = 0; x<5; x++){\nlet y = 8;\nbreak;\n}', result)
 
     def test_should_be_able_to_return_value(self):
         self.put_string('letx=7;return')
@@ -257,6 +257,16 @@ class TestScope(unittest.TestCase):
         self.put_string('+')
         valid = self.scope.get_valid_characters()
         self.assertTrue('+' in valid)
+
+    def test_should_include_semicolon_at_last_line_of_scope(self):
+        self.put_string('varx=9;x++')
+        str = self.scope.to_string()
+        self.assertTrue(str[len(str)-1] == ';')
+
+    def test_should_not_include_semicolon_if_last_character_is_brace(self):
+        self.put_string('if(true){console.log(x);}')
+        str = self.scope.to_string()
+        self.assertTrue(str[len(str)-1] != ';')
 
     def put_string(self, str):
         for c in str:
@@ -469,7 +479,7 @@ class TestConditional(unittest.TestCase):
         for c in str:
             condition.put_character(c)
 
-        self.assertEqual('if(5==5){\nvar x = 7\n}', condition.to_string())
+        self.assertEqual('if(5==5){\nvar x = 7;\n}', condition.to_string())
 
     def test_should_allow_brace_after_closing_condition(self):
         self.put_string('(5==5)')
@@ -517,7 +527,7 @@ class TestWhileLoop(unittest.TestCase):
     def test_should_be_able_to_convert_to_string(self):
         self.put_string('(6==6){varx=7;vary=8;}')
         result = self.loop.to_string()
-        self.assertEqual('while(6==6){\nvar x = 7;\nvar y = 8\n}', result)
+        self.assertEqual('while(6==6){\nvar x = 7;\nvar y = 8;\n}', result)
 
     def put_string(self, str):
         for c in str:
@@ -589,7 +599,7 @@ class TestForLoop(unittest.TestCase):
         for c in str:
             loop.put_character(c)
 
-        self.assertEqual('for(let x = 0; x<7; x++){\nlet y = 8\n}', loop.to_string())
+        self.assertEqual('for(let x = 0; x<7; x++){\nlet y = 8;\n}', loop.to_string())
 
     def test_valid_should_include_equals_in_initializer(self):
         self.put_string('(letx')

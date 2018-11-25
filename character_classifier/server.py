@@ -7,10 +7,10 @@ from flask import Flask, request
 from werkzeug.utils import secure_filename
 import numpy as np
 import cv2
+import math
 
 app = Flask(__name__)
 classifier = classifier.Model()
-parser = context.Scope({})
 textdetection = td.TextDetection()
 
 mappings = {
@@ -27,12 +27,15 @@ def encode(char):
     return mappings[char]
 
 def list_from_regex(regex_str):
+    print(regex_str)
+    if regex_str[0] == '|':
+        regex_str = regex_str[1:]
+
     regex = re.compile(regex_str)
     result = []
     for c in mappings.keys():
         if regex.match(c):
             result.append(mappings[c])
-
     return result
 
 def decode(index):
@@ -41,6 +44,7 @@ def decode(index):
 
 @app.route('/', methods=['POST'])
 def process_image():
+    parser = context.Scope({})
     data = request.get_data()
     file_bytes = np.asarray(bytearray(data), dtype=np.uint8)
     img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
@@ -52,7 +56,7 @@ def process_image():
     probabilities = classifier.predict(char_images)
 
     for index, c_img in enumerate(char_images):
-        if np.max(c_img) == 0:
+        if np.max(c_img) == 0 or math.isnan(np.max(c_img)):
             parser.put_character('\n')
         else:
             valid = parser.get_valid_characters()
@@ -63,6 +67,6 @@ def process_image():
             char = valid[np.argmax(valid_prob)]
             char = decode(char)
             cv2.imwrite('test' + str(index) + '.jpg', (np.reshape(c_img, (32, 32, 1))+0.13147026078678872)*255)
-            print(char)
+            print(index, char)
             parser.put_character(char)
     return parser.to_string()

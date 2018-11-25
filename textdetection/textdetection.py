@@ -117,7 +117,8 @@ class TextDetection:
                             w = abs(x - max(x1 + w1, x2 + w2))
                             newBox = (x, y, w, h)
 
-                            addToLine.append(newBox)
+                            if newBox not in addToline:
+                                addToLine.append(newBox)
                             if box1 not in removeBoxes:
                                 removeBoxes.append(box1)
                             if box2 not in removeBoxes:

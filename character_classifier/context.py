@@ -342,7 +342,7 @@ class Expression:
         token_chars = set([t[len(token)] for t in self.token_dict.keys() if len(t) > len(token) and t.startswith(token)])
 
         if len(self.current_symbol) == 0 or token in self.token_dict.keys():
-            if self.current_symbol.count('+') < 2: token_chars.add('+')
+            if self.current_symbol.count('+') < 2: token_chars.add('\+')
             if self.current_symbol.count('-') < 2: token_chars.add('-')
 
         token_chars = '|'.join(token_chars)

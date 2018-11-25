@@ -8,6 +8,10 @@ from werkzeug.utils import secure_filename
 import numpy as np
 import cv2
 import math
+import test_context
+
+import subprocess
+
 
 app = Flask(__name__)
 classifier = classifier.Model()
@@ -48,10 +52,11 @@ def process_image():
     data = request.get_data()
     file_bytes = np.asarray(bytearray(data), dtype=np.uint8)
     img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-
+    cv2.imwrite('testFile.jpg', img)
     # returns [n, 32, 32] matrix of images
     char_images = textdetection.execute(img)
-
+    cv2.imwrite('testFile2.jpg', char_images[0])
+    print(np.shape(char_images))
     #returns [n, 93] matrix of probabilities
     probabilities = classifier.predict(char_images)
 
@@ -70,3 +75,9 @@ def process_image():
             print(index, char)
             parser.put_character(char)
     return parser.to_string()
+
+@app.route('/', methods=['GET'])
+def runTests():
+    result = subprocess.check_output(['python3', 'test_context.py'], stderr=subprocess.STDOUT)
+    return(result)
+    

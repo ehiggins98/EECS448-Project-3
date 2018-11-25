@@ -1,5 +1,6 @@
 import context
 import classifier
+import textdetection as td
 
 import re
 from flask import Flask, request
@@ -10,6 +11,7 @@ import cv2
 app = Flask(__name__)
 classifier = classifier.Model()
 parser = context.Scope({})
+textdetection = td.TextDetection()
 
 mappings = {
     '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14,
@@ -25,7 +27,6 @@ def encode(char):
     return mappings[char]
 
 def list_from_regex(regex_str):
-    print(regex_str)
     regex = re.compile(regex_str)
     result = []
     for c in mappings.keys():
@@ -42,26 +43,26 @@ def decode(index):
 def process_image():
     data = request.get_data()
     file_bytes = np.asarray(bytearray(data), dtype=np.uint8)
-    img = cv2.imdecode(file_bytes, 0)
+    img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-    # Process image into individual characters @not Zak
-    # I'm going to assume it's contained in an array of 32x32 grayscale images called char_images
-    # @not Zak if the character is a new line, just put None in the array of character images
-    char_images = []
-    for c_img in char_images:
-        if not c_img:
+    # returns [n, 32, 32] matrix of images
+    char_images = textdetection.execute(img)
+
+    #returns [n, 93] matrix of probabilities
+    probabilities = classifier.predict(char_images)
+
+    for index, c_img in enumerate(char_images):
+        if np.max(c_img) == 0:
             parser.put_character('\n')
-
         else:
-            # this is a 93-dimensional vector of probabilities for each class
-            probabilities = classifier.predict(c_img)
             valid = parser.get_valid_characters()
             valid = list_from_regex(valid)
 
             # this is a vector of probabilities including only the syntactically-valid characters at this point in the code
-            valid_prob = np.take(probabilities, valid)
+            valid_prob = np.take(probabilities[index], valid)
             char = valid[np.argmax(valid_prob)]
             char = decode(char)
+            cv2.imwrite('test' + str(index) + '.jpg', (np.reshape(c_img, (32, 32, 1))+0.13147026078678872)*255)
+            print(char)
             parser.put_character(char)
-
     return parser.to_string()

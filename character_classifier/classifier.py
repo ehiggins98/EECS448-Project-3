@@ -20,12 +20,7 @@ class Model:
 
     def predict(self, img):
         img = img.astype(np.float32)
-        mean = 0.13147026078678872
-
-        img = np.divide(img, 255)
-        img = np.subtract(img, mean)
-
-        return self.classifier.predict(tf.estimator.inputs.numpy_input_fn(img, shuffle=False)).__next__()
+        return self.classifier.predict(tf.estimator.inputs.numpy_input_fn(img, shuffle=False), yield_single_examples=False).__next__()
 
     def cnn_model_fn(self, features, labels, mode):
         input_layer = tf.reshape(features, [-1, 32, 32, 1], name='inputs')

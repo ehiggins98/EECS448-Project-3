@@ -15,7 +15,6 @@ class TextDetection:
         self.listLines = []
         self.listImages = []
         self.img = img
-        print(np.shape(self.img))
         self.boxCharacters()
         self.deleteBoxinBox()
         self.genLists()
@@ -110,7 +109,8 @@ class TextDetection:
                             w = abs(x - max(x1 + w1, x2 + w2))
                             newBox = (x, y, w, h)
 
-                            addToLine.append(newBox)
+                            if newBox not in addToLine:
+                                addToLine.append(newBox)
                             if box1 not in removeBoxes:
                                 removeBoxes.append(box1)
                             if box2 not in removeBoxes:
@@ -190,6 +190,21 @@ class TextDetection:
         for line in self.listLines:
             line.sort(key=lambda tup: tup[0])
 
+    def get_box_specs(self, box, dim):
+        x, y, w, h = box
+        yDiff = int((dim - h)/2)
+        xDiff = int((dim - w)/2)
+        adjustX = 0
+        adjustY = 0
+
+        if yDiff != (dim - h)/2:
+            adjustY = 1
+
+        if xDiff != (dim - w)/2:
+            adjustX = 1
+
+        return xDiff, yDiff, w, h
+
     def cutImages(self):
         listImages = []
         maxDimension = 0
@@ -207,11 +222,7 @@ class TextDetection:
                     maxLine = lineIndex
                 img = self.img[box[1]: box[1] + box[3], box[0]: box[0] + box[2]]
 
-
                 img = cv.GaussianBlur(img, (0, 0), 1)
-
-
-
                 lineImages.append(img)
             listImages.append(lineImages)
         self.listImages = listImages
@@ -223,25 +234,9 @@ class TextDetection:
 
         for lineIndex, line in enumerate(self.listLines):
             for boxIndex, box in enumerate(line):
-                newImg = np.zeros((maxDimension, maxDimension))
-                x, y, w, h = box
-
-                yDiff = (maxDimension - h)/2
-                xDiff = (maxDimension - w)/2
-                yDiffInt = int((maxDimension - h)/2)
-                xDiffInt = int((maxDimension - w)/2)
-                adjustX = 0
-                adjustY = 0
-
-                if yDiffInt != yDiff:
-                    adjustY = 1
-
-                if xDiffInt != xDiff:
-                    adjustX = 1
-
-                np.set_printoptions(threshold=10000000)
-
-                newImg[yDiffInt: maxDimension - yDiffInt - adjustY, xDiffInt: maxDimension - xDiffInt - adjustX] = self.listImages[lineIndex][boxIndex]
+                x, y, w, h = self.get_box_specs(box, maxDimension)
+                newImg = np.zeros((int(maxDimension), int(maxDimension)))
+                newImg[y:h + y, x:w + x] = self.listImages[lineIndex][boxIndex]
 
                 newImg = cv.resize(newImg, (32, 32), interpolation=cv.INTER_CUBIC)
                 maxNewImg = np.max(newImg)

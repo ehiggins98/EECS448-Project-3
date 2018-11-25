@@ -1,18 +1,26 @@
 import unittest
 import context
+import logging
+import sys
+
+
+
 
 starting_chars = "[A-z$]"
 non_starting_chars = starting_chars + "|\\d"
 number_characters = '\\d|-|\+'
-literal_starting_chars = '\"|\'|t|f|\d|-'
+literal_starting_chars = '\'|t|f|\d|-'
 binary_operator_chars = '&|\||-|\+|\/|\*|>|<|!|=|%'
 
 class TestFunction(unittest.TestCase):
     def setUp(self):
+        
         self.function = context.Function({})
 
     def test_should_return_correct_initial_characters(self):
+        
         valid = self.function.get_valid_characters()
+        
         self.assertEqual(starting_chars, valid)
 
     def test_should_return_correct_noninitial_characters(self):
@@ -60,13 +68,13 @@ class TestScope(unittest.TestCase):
         self.scope = context.Scope({})
 
     def test_should_return_correct_initial_characters_with_no_tokens(self):
-        expected = {'i', 'w', 'l', 'v', 'c', 'f', '\\', '}', 'r', 'b'}
+        expected = {'i', 'w', 'l', 'v', 'c', 'f', 'r', 'b'}
         valid = self.scope.get_valid_characters()
         valid = set([c for c in valid if c != '|'])
         self.assertEqual(expected, valid)
 
     def test_should_return_correct_initial_characters_with_tokens(self):
-        expected = {'i', 'w', 'l', 'v', 'c', 'f', 'b', '\\', '}', 'r', '+', '-'}
+        expected = {'i', 'w', 'l', 'v', 'c', 'f', 'b', 'r'}
         c = context.Scope({'bar': {}})
         valid = c.get_valid_characters()
         valid = set([c for c in valid if c != '|'])
@@ -88,18 +96,18 @@ class TestScope(unittest.TestCase):
     def test_should_be_able_to_enter_multiple_variable_declarations(self):
         self.put_string('varx=5;')
         valid = self.scope.get_valid_characters()
-        expected = {'i', 'w', 'l', 'v', 'c', 'f', '\\', '}', 'x', 'b', 'r', '+', '-'}
+        expected = {'i', 'w', 'l', 'v', 'c', 'f', 'x', 'b', 'r'}
         valid = set([c for c in valid if  c != '|'])
         self.assertEqual(expected, valid)
 
         self.put_string('lety=')
         valid = set([c for c in self.scope.get_valid_characters() if c != '|'])
-        expected = {'"', '\'', 't', 'f', '\\', 'd', '-', '(', '!', 'c', 'x', '+'}
+        expected = {'\'', 't', 'f', '\\', 'd', '-', '(', '!', 'c', 'x', '+'}
         self.assertEqual(expected, valid)
 
     def test_should_be_able_to_put_declaration_inside_function(self):
         self.put_string('functionabc(a){')
-        expected = {'i', 'w', 'l', 'v', 'c', 'f', '\\', '}', 'a', 'b', 'r', '+', '-'}
+        expected = {'i', 'w', 'l', 'v', 'c', 'f', '\\', '}', 'a', 'b', 'r'}
         valid = set([c for c in self.scope.get_valid_characters() if c != '|'])
         self.assertEqual(expected, valid)
 
@@ -111,10 +119,6 @@ class TestScope(unittest.TestCase):
         self.put_string('if(5==5){varx=7;}elseif(6==6){varx=8;}else{varx=3;}')
         self.assertEqual('if(5==5){\nvar x = 7;\n}\nelse if(6==6){\nvar x = 8;\n}\nelse{\nvar x = 3;\n}', self.scope.to_string())
 
-    def test_should_allow_close_brace_at_end(self):
-        self.put_string('varx=5;')
-        self.assertTrue('}' in self.scope.get_valid_characters())
-
     def test_should_be_able_to_use_while_loop(self):
         self.put_string('while(5==5){')
         expected = {'i', 'w', 'l', 'v', 'c', 'f', '\\', '}', 'b', 'r'}
@@ -124,13 +128,13 @@ class TestScope(unittest.TestCase):
         self.put_string('}varx=7;')
         valid = set([c for c in self.scope.get_valid_characters() if c != '|'])
         expected.add('x')
-        expected.add('+')
-        expected.add('-')
+        expected.remove('}')
+        expected.remove('\\')
         self.assertEqual(expected, valid)
 
     def test_should_be_able_to_use_for_loop(self):
         self.put_string('letz=8;for(letx=7;x<5;x++){')
-        expected = {'i', 'w', 'l', 'v', 'c', 'f', '\\', '}', 'x', 'z', 'b', 'r', '+', '-'}
+        expected = {'i', 'w', 'l', 'v', 'c', 'f', '\\', '}', 'x', 'z', 'b', 'r'}
         valid = set([c for c in self.scope.get_valid_characters() if c != '|'])
         self.assertEqual(expected, valid)
 
@@ -215,10 +219,10 @@ class TestScope(unittest.TestCase):
         str = self.scope.to_string()
         self.assertEqual('console.log(\'here\');', str)
 
-    def test_valid_should_be_dot_after_opening_string_literal(self):
+    def test_valid_should_be_not_comma_after_opening_string_literal(self):
         self.put_string('console.log(\'')
         valid = self.scope.get_valid_characters()
-        self.assertEqual('.', valid)
+        self.assertEqual('[^,]|c', valid)
 
     def test_valid_should_include_equals_after_for_loop_initializer(self):
         self.put_string('for(letx')
@@ -229,20 +233,6 @@ class TestScope(unittest.TestCase):
         self.put_string('for(l')
         valid = self.scope.get_valid_characters()
         self.assertEqual('e', valid)
-
-    def test_should_allow_plus_plus(self):
-        valid = self.scope.get_valid_characters()
-        self.assertTrue('+' not in valid and '-' not in valid)
-
-        self.put_string('varx=8;')
-
-        valid = self.scope.get_valid_characters()
-        self.assertTrue('+' in valid and '-' in valid)
-
-        self.put_string('x')
-
-        valid = self.scope.get_valid_characters()
-        self.assertTrue('+' in valid and '-' in valid)
 
     def test_should_allow_completion_of_plus_plus_x(self):
         self.put_string('varx=8;++x')
@@ -268,6 +258,10 @@ class TestScope(unittest.TestCase):
         str = self.scope.to_string()
         self.assertTrue(str[len(str)-1] != ';')
 
+    def test_should_allow_else(self):
+        self.put_string('letx=7;if(true){console.log(x);}')
+        self.assertTrue('e' in self.scope.get_valid_characters())
+
     def put_string(self, str):
         for c in str:
             self.scope.put_character(c)
@@ -288,19 +282,19 @@ class TestVariableDeclaration(unittest.TestCase):
     def test_should_return_correct_characters_after_equal_sign(self):
         self.put_string('a=')
         valid = set([c for c in self.declaration.get_valid_characters() if c != '|'])
-        expected = set([c for c in '"|\'|t|f|\d|-|\(|!|+' if c != '|'])
+        expected = set([c for c in '\'|t|f|\d|-|\(|!|+' if c != '|'])
 
         self.assertEqual(expected, valid)
 
     def test_should_return_correct_characters_after_starting_num_value(self):
         self.put_string('a=5')
         valid = self.declaration.get_valid_characters()
-        self.assertEqual("&|\||-|\+|\/|\*|>|<|!|=|%|\)|;|\n|\.", valid)
+        self.assertEqual("&|\\||-|\\+|\\/|\\*|>|<|!|=|%|\\d|-|\\+|\\.|\\)|;|\n|\\.", valid)
 
     def test_should_return_correct_characters_after_starting_string_literal(self):
         self.put_string('a="')
         valid = self.declaration.get_valid_characters()
-        self.assertEqual('.', valid)
+        self.assertEqual('[^,]', valid)
 
     def test_should_return_correct_value_after_starting_boolean_literal(self):
         self.put_string('a=t')
@@ -345,22 +339,22 @@ class TestVariableDeclaration(unittest.TestCase):
 
 class TestExpression(unittest.TestCase):
     def setUp(self):
-        self.exp = context.Expression({}, False)
+        self.exp = context.Expression({}, False, False)
 
     def test_should_require_token_literal_or_not_to_start(self):
-        exp = context.Expression({'obama': {}}, False)
+        exp = context.Expression({'obama': {}}, False, False)
         valid = set([c for c in exp.get_valid_characters() if c != '|'])
         expected = set([c for c in literal_starting_chars + "|\(|!|o|+|-" if c != '|'])
         self.assertEqual(expected, valid)
 
     def test_should_require_token_literal_or_open_paren_after_unary_op(self):
-        exp = context.Expression({'truman': {}}, False)
+        exp = context.Expression({'truman': {}}, False, False)
         exp.put_character('!')
         valid = exp.get_valid_characters()
         self.assertEqual(literal_starting_chars + '|t|\(|=', valid)
 
     def test_should_require_parens_or_binary_op_after_token_and_literal(self):
-        exp = context.Expression({'drumpf': {}}, False)
+        exp = context.Expression({'drumpf': {}}, False, False)
         exp.put_character('d')
         exp.put_character('r')
         exp.put_character('u')
@@ -371,40 +365,40 @@ class TestExpression(unittest.TestCase):
         self.assertEqual(binary_operator_chars + '|\)|;|\n|\.', valid)
 
     def test_should_require_literal_token_or_unary_after_open_paren(self):
-        exp = context.Expression({'coolidge': {}}, False)
+        exp = context.Expression({'coolidge': {}}, False, False)
         exp.put_character('(')
         valid = set([c for c in exp.get_valid_characters() if c != '|'])
         expected = set([c for c in literal_starting_chars + 'c|!|\(' if c != '|'])
         self.assertEqual(expected, valid)
 
     def test_should_require_binary_op_after_close_paren(self):
-        exp = context.Expression({'adams': {}}, False)
+        exp = context.Expression({'adams': {}}, False, False)
         exp.put_character(')')
         valid = exp.get_valid_characters()
         self.assertEqual(binary_operator_chars, valid)
 
     def test_should_require_finishing_token_in_middle_of_token(self):
-        exp = context.Expression({'mckinley': {}}, False)
+        exp = context.Expression({'mckinley': {}}, False, False)
         exp.put_character('m')
         valid = exp.get_valid_characters()
         self.assertEqual('c', valid)
 
     def test_should_require_finishing_operator_in_middle_of_binary_op(self):
-        exp = context.Expression({'roosevelt2': {}}, False)
+        exp = context.Expression({'roosevelt2': {}}, False, False)
         exp.put_character('>')
         valid = exp.get_valid_characters()
         self.assertEqual(literal_starting_chars + "|\(|!|=|r", valid, valid)
 
     def test_should_require_numbers_in_middle_of_num_literal(self):
-        exp = context.Expression({'teddyyyyy': {}}, False)
+        exp = context.Expression({'teddyyyyy': {}}, False, False)
         exp.put_character('5')
         valid = exp.get_valid_characters()
-        self.assertEqual('&|\||-|\+|\/|\*|>|<|!|=|%|\)|;|\n|\.', valid)
+        self.assertEqual('&|\\||-|\\+|\\/|\\*|>|<|!|=|%|\\d|-|\\+|\\.|\\)|;|\n|\\.', valid)
 
     def test_should_require_any_char_in_string_literal(self):
         self.put_string('"')
         valid = self.exp.get_valid_characters()
-        self.assertEqual('.', valid)
+        self.assertEqual('[^,]', valid)
 
     def test_should_require_finish_literal_in_bool_literal(self):
         self.put_string('tr')
@@ -412,7 +406,7 @@ class TestExpression(unittest.TestCase):
         self.assertEqual('u', valid)
 
     def test_should_require_operator_after_string_literal(self):
-        self.put_string('"abc"')
+        self.put_string('\'abc\'')
         valid = self.exp.get_valid_characters()
         self.assertEqual(binary_operator_chars + '|\)|;|\n|\.', valid)
 
@@ -434,7 +428,7 @@ class TestExpression(unittest.TestCase):
         self.assertTrue('+' in self.exp.get_valid_characters())
 
     def test_should_be_able_to_use_mod_operator(self):
-        exp = context.Expression({'x': {}}, False)
+        exp = context.Expression({'x': {}}, False, False)
         exp.put_character('x')
         valid = exp.get_valid_characters()
         self.assertTrue('%' in valid)
@@ -469,7 +463,7 @@ class TestConditional(unittest.TestCase):
             condition.put_character(c)
 
         valid = condition.get_valid_characters()
-        expected = {'i', 'w', 'l', 'v', 'c', 'f', 'q', '\\', '}', 'b', 'r', '+', '-'}
+        expected = {'i', 'w', 'l', 'v', 'c', 'f', 'q', '\\', '}', 'b', 'r'}
         valid = set([c for c in valid if c != '|'])
         self.assertEqual(expected, valid)
 
@@ -509,7 +503,7 @@ class TestWhileLoop(unittest.TestCase):
         for c in '(5==5){':
             loop.put_character(c)
 
-        expected = {'i', 'w', 'l', 'v', 'c', 'f', 't', '\\', '}', 'b', 'r', '+', '-'}
+        expected = {'i', 'w', 'l', 'v', 'c', 'f', 't', '\\', '}', 'b', 'r'}
         valid = loop.get_valid_characters()
         valid = set([c for c in valid if c != '|'])
         self.assertEqual(expected, valid)
@@ -556,7 +550,7 @@ class TestForLoop(unittest.TestCase):
             loop.put_character(c)
 
         valid = set([c for c in loop.get_valid_characters() if c != '|'])
-        expected = set([c for c in literal_starting_chars + "\(|!|b|x|+" if c != '|'])
+        expected = set(['x', 'b'])
         self.assertEqual(expected, valid)
 
     def test_should_require_expression_in_increment(self):
@@ -567,7 +561,7 @@ class TestForLoop(unittest.TestCase):
             loop.put_character(c)
 
         valid = set([c for c in loop.get_valid_characters() if c != '|'])
-        expected = set([c for c in literal_starting_chars + "|\(|!|d|x|+" if c != '|'])
+        expected = set(['d', 'x'])
         self.assertEqual(expected, valid)
 
     def test_should_require_body_starting_chars_in_body(self):
@@ -578,7 +572,7 @@ class TestForLoop(unittest.TestCase):
             loop.put_character(c)
 
         valid = loop.get_valid_characters()
-        expected = {'i', 'w', 'l', 'v', 'c', 'f', '\\', '}', 'x', 'b', 'r', '+', '-'}
+        expected = {'i', 'w', 'l', 'v', 'c', 'f', '\\', '}', 'x', 'b', 'r'}
         valid = set([c for c in valid if c != '|'])
         self.assertEqual(expected, valid)
 
@@ -639,7 +633,7 @@ class TestFunctionCall(unittest.TestCase):
     def test_should_require_token_or_literal_as_param(self):
         self.put_string('clinton(')
         valid = set([c for c in self.call.get_valid_characters() if c != '|'])
-        expected = set([c for c in '"|\'|t|f|\d|-|\(|!|c|\)|+|-' if c != '|'])
+        expected = set([c for c in '\'|t|f|\d|-|\(|!|c|\)|+|-' if c != '|'])
         self.assertEqual(expected, valid)
 
         self.put_string('c')
@@ -649,7 +643,7 @@ class TestFunctionCall(unittest.TestCase):
     def test_should_be_able_to_take_multiple_params(self):
         self.put_string('clinton(clint,')
         valid = set([c for c in self.call.get_valid_characters() if c != '|'])
-        expected = set([c for c in '"|\'|t|f|\d|-|\(|!|c|+' if c != '|'])
+        expected = set([c for c in '\'|t|f|\d|-|\(|!|c|+' if c != '|'])
         self.assertEqual(expected, valid)
 
         self.put_string('c')
@@ -683,7 +677,7 @@ class TestAuxiliaryFlag(unittest.TestCase):
         self.flag = context.AuxiliaryFlag('return', {})
 
     def test_should_require_literal_semicolon_or_new_line(self):
-        expected = set([c for c in '"|\'|t|f|\\d|-|\(|!|;|\n|+|-' if c != '|'])
+        expected = set([c for c in '\'|t|f|\\d|-|\(|!|;|\n|+|-' if c != '|'])
         valid = set([c for c in self.flag.get_valid_characters() if c != '|'])
         self.assertEqual(expected, valid)
 
@@ -702,5 +696,18 @@ class TestAuxiliaryFlag(unittest.TestCase):
         result = self.flag.to_string()
         self.assertEqual('return', result)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def main():
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestFunction)
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestVariableDeclaration)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestAuxiliaryFlag)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestConditional)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestExpression)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestForLoop)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestScope)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestFunctionCall)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestWhileLoop)])
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    
+    
+main()

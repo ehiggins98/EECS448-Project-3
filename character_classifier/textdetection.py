@@ -11,11 +11,13 @@ import filter
 
 class TextDetection:
     def execute(self, img):
+        
         self.listRect = []
         self.listLines = []
         self.listImages = []
         self.img = img
         self.boxCharacters()
+        self.writeRectsToImage()
         self.deleteBoxinBox()
         self.genLists()
         self.sortListLines()
@@ -45,7 +47,7 @@ class TextDetection:
     # KEEP
 
     def writeRectsToImage(self):
-        vis = self.original.copy()
+        vis = self.img.copy()
         counter = 0
         for line in self.listLines:
             for box in line:

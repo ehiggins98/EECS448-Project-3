@@ -47,17 +47,59 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var _image;
-  var _text;
+  var _text = "Take a Picture";
+  var _showEditor = false;
+  final TextEditingController _controller = new TextEditingController(
+    text: 'This is where the code will be'
+  );
+  final FocusNode _focusNode = new FocusNode();
 
   Future takePic() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
     var text;
 
+
     setState(() {
       _image = image;
       _text = text;
+      _showEditor = true;
     });
 
+    // showEditor();
+
+
+//    print('showing snack bar');
+
+// Find the Scaffold in the Widget tree and use it to show a SnackBar
+  }
+
+  showEditor() async{
+    // Dio dio = new Dio();
+    // FormData formdata = new FormData.from({
+    //   "file": new UploadFileInfo(_image, _image.path)
+    // });
+    setState(() {
+          _showEditor = true;
+        });
+    print(_showEditor);
+
+    // Some code to get back code from the picture
+    // var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
+    //     method: 'POST',
+    //     responseType: ResponseType.PLAIN // or ResponseType.JSON
+    // ))
+    //     .then((response) => setState(() {
+    //       _image = null;
+    //       this._showEditor = true;
+    //       print('response is $response');
+    //       _controller.text = response.toString();
+    //       print('controller text is ${_controller.text}')
+    //       _text = response.toString();}))
+    //     .catchError((error) => print(error));
+
+  }
+
+  submitCode() async{
     Dio dio = new Dio();
     FormData formdata = new FormData.from({
       "file": new UploadFileInfo(_image, _image.path)
@@ -71,15 +113,9 @@ class _MyHomePageState extends State<MyHomePage> {
           _image = null;
           _text = response.toString();}))
         .catchError((error) => print(error));
-
-    print(text);
-
-    print('response is $response');
-//    final snackBar = SnackBar(content: Text('Yay! A SnackBar!'));
-//    print('showing snack bar');
-
-// Find the Scaffold in the Widget tree and use it to show a SnackBar
   }
+
+
 
   Future getPic() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -101,16 +137,29 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: new Text(widget.title),
-        centerTitle: true,
+        actions: <Widget>[
+          FlatButton(onPressed: (){}, child: Text('Test', style: TextStyle(color: Colors.white),),)
+        ],
+        centerTitle: true
 //        actions: <Widget>[
 //          FlatButton(child: Icon(Icons.photo, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: getPic)
 //        ],
-      ),
+      )
       body: new Center(
 
-        child: _image == null || _text != null
-            ? _text == null ? Text('No image selected.') : Text(_text)
-            : Image.file(_image),
+        child: _showEditor == true ? TextFormField(
+          onFieldSubmitted: (String response){
+            print('submitted text: $response');
+          },
+          controller: _controller,
+          focusNode: _focusNode,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.all(8.0),
+            border: InputBorder.none
+          )
+        ) : SizedBox(
+          child: Text(_text),
+        )
       ),
 
       floatingActionButton: new FloatingActionButton(

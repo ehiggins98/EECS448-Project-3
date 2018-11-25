@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\ericd\\CodeProjects\\EECS448-Project-3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v24\\values-v24.xml",
+            "outputFile": "C:\\Users\\joshh\\Documents\\EECS 448 Labs and Projects\\EECS448-Project-3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v24\\values-v24.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\ericd\\.gradle\\caches\\transforms-1\\files-1.1\\support-media-compat-27.1.1.aar\\499052c50b5b7d7558a223b970be4145\\res\\values-v24\\values-v24.xml",
+                    "source": "C:\\Users\\joshh\\.gradle\\caches\\transforms-1\\files-1.1\\support-media-compat-27.1.1.aar\\2803de782aec459f739e3a0dfd68b588\\res\\values-v24\\values-v24.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

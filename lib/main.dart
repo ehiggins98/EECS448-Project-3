@@ -119,8 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
            this._showEditor = true;
            _controller.text = response.toString();
            print('controller text is ${_controller.text}');
-          Navigator.push(context,
-          MaterialPageRoute(builder: (context) => TestPage(text: response.data.toString())));
+
            }))
          .catchError((error) => print(error));
 
@@ -152,7 +151,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
  runTests() async {
     Dio dio = new Dio();
-    Response<String> response = await dio.get("http://35.208.187.194");
+    
+    Response<String> response = await dio.get("http://35.208.187.194",options: Options(
+         method: 'GET',
+         responseType: ResponseType.JSON // or ResponseType.JSON
+     ));
 
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => TestPage(text: response.data)));
@@ -183,8 +186,9 @@ class _MyHomePageState extends State<MyHomePage> {
           FlatButton(child: Icon(Icons.photo, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: getPic)
         ,
           FlatButton(onPressed: (){
-            //runTests();
-            submitCode("hello");
+            //showEditor();
+            runTests();
+            //submitCode("hello");
           }, child: Text('Unit Test', style: TextStyle(color: Colors.white),),)
         ],
         centerTitle: true

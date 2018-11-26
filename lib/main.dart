@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
+import 'dart:convert';
 
 void main() => runApp(new MyApp());
 
@@ -24,6 +25,33 @@ class MyApp extends StatelessWidget {
       ),
       home: new MyHomePage(title: 'Code Compiler'),
     );
+  }
+}
+
+
+class TestPage extends StatelessWidget {
+  final String text;
+  TestPage({Key key, @required this.text});
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Unit Tests"),
+        ),
+        body: Padding(padding: EdgeInsets.all(16.0), child: SingleChildScrollView(child: Text(this.text))));
+  }
+}
+
+class CodeOutput extends StatelessWidget {
+  final String text;
+  CodeOutput({Key key, @required this.text});
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Code Output"),
+        ),
+        body: Padding(padding: EdgeInsets.all(16.0), child: SingleChildScrollView(child: Text(this.text))));
   }
 }
 
@@ -73,45 +101,65 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   showEditor() async{
-    // Dio dio = new Dio();
-    // FormData formdata = new FormData.from({
-    //   "file": new UploadFileInfo(_image, _image.path)
-    // });
+    Dio dio = new Dio();
+    FormData formdata = new FormData.from({
+       "file": new UploadFileInfo(_image, _image.path)
+     });
     setState(() {
           _showEditor = true;
         });
 
     // Some code to get back code from the picture
-    // var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
-    //     method: 'POST',
-    //     responseType: ResponseType.PLAIN // or ResponseType.JSON
-    // ))
-    //     .then((response) => setState(() {
-    //       _image = null;
-    //       this._showEditor = true;
-    //       _controller.text = response.toString();
-    //       print('controller text is ${_controller.text}')
-    //       _text = response.toString();}))
-    //     .catchError((error) => print(error));
+    var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
+         method: 'POST',
+         responseType: ResponseType.PLAIN // or ResponseType.JSON
+     ))
+         .then((response) => setState(() {
+           _image = null;
+           this._showEditor = true;
+           _controller.text = response.toString();
+           print('controller text is ${_controller.text}');
+
+           }))
+         .catchError((error) => print(error));
 
   }
 
-  submitCode(String response) async{
-    // Dio dio = new Dio();
-    // FormData formdata = new FormData.from({
-    //   "file": new UploadFileInfo(_image, _image.path)
-    // });
-
-    // var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
-    //     method: 'POST',
-    //     responseType: ResponseType.PLAIN // or ResponseType.JSON
-    // ))
-    //     .then((response) => setState(() {
-    //       _image = null;
-    //       _text = response.toString();}))
-    //     .catchError((error) => print(error));
+  submitCode(String content) async{
+    Dio dio = new Dio();
+    /*FormData formdata = new FormData.from({
+       "file": new UploadFileInfo(_image, _image.path)
+    });*/
+    print("hello");
+    var data = json.encode({
+      "params": [],
+      "code": _controller.text.toString()
+    });
+    print(data);
+    var response = await dio.post('http://35.193.209.164', data: data, options: Options(
+         method: 'POST',
+         responseType: ResponseType.JSON // or ResponseType.JSON
+     ))
+         .then((response) => setState(() {
+        
+           _image = null;
+          int length = response.data.length - 1;
+          Navigator.push(context,
+          MaterialPageRoute(builder: (context) => TestPage(text: response.data.substring(1, length))));
+          }))
+         .catchError((error) => print(error));
   }
+ runTests() async {
+    Dio dio = new Dio();
+    
+    Response<String> response = await dio.get("http://35.208.187.194",options: Options(
+         method: 'GET',
+         responseType: ResponseType.JSON // or ResponseType.JSON
+     ));
 
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => TestPage(text: response.data)));
+  }
 
 
   Future getPic() async {
@@ -135,12 +183,16 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: new Text(widget.title),
         actions: <Widget>[
-          FlatButton(onPressed: (){}, child: Text('Test', style: TextStyle(color: Colors.white),),)
+          FlatButton(child: Icon(Icons.photo, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: getPic)
+        ,
+          FlatButton(onPressed: (){
+            //showEditor();
+            runTests();
+            //submitCode("hello");
+          }, child: Text('Unit Test', style: TextStyle(color: Colors.white),),)
         ],
         centerTitle: true
-//        actions: <Widget>[
-//          FlatButton(child: Icon(Icons.photo, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: getPic)
-//        ],
+
       ),
       body: new Center(
 

@@ -16,8 +16,8 @@ var_map = {
 
 class Model:
     def __init__(self):
-        self.classifier = tf.estimator.Estimator(model_fn=self.cnn_model_fn, model_dir="specific model/76 percent accuracy/model")
-
+        self.classifier = tf.estimator.Estimator(model_fn=self.cnn_model_fn, model_dir="specific model/76 percent accuracy/model/")
+        print(tf.VERSION)
     def predict(self, img):
         img = img.astype(np.float32)
         return self.classifier.predict(tf.estimator.inputs.numpy_input_fn(img, shuffle=False), yield_single_examples=False).__next__()

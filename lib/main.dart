@@ -108,9 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
           _showEditor = true;
         });
-
+    
     // Some code to get back code from the picture
-    var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
+    var response = await dio.post('http://35.208.187.194:5000', data: formdata, options: Options(
          method: 'POST',
          responseType: ResponseType.PLAIN // or ResponseType.JSON
      ))
@@ -125,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
-  submitCode(String content) async{
+  submitCode() async{
     Dio dio = new Dio();
     /*FormData formdata = new FormData.from({
        "file": new UploadFileInfo(_image, _image.path)
@@ -183,8 +183,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: new Text(widget.title),
         actions: <Widget>[
-          FlatButton(child: Icon(Icons.photo, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: getPic)
-        ,
+          FlatButton(child: Icon(Icons.photo, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: getPic),
+          FlatButton(child: Icon(Icons.file_upload, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: submitCode),
+     
           FlatButton(onPressed: (){
             //showEditor();
             runTests();
@@ -198,7 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
         child: _showEditor == true ? TextFormField(
           onFieldSubmitted: (String response){
-            submitCode(response);
+            submitCode();
           },
           controller: _controller,
           focusNode: _focusNode,
@@ -210,12 +211,14 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Text(_text),
         )
       ),
-
+    
       floatingActionButton: new FloatingActionButton(
         onPressed: takePic,
         tooltip: 'Pick Image',
         child: new Icon(Icons.add_a_photo),
       ),
+      
+      
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

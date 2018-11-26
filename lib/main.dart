@@ -62,10 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _image = image;
       _text = text;
-      _showEditor = true;
     });
 
-    // showEditor();
+    showEditor();
 
 
 //    print('showing snack bar');
@@ -81,7 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
           _showEditor = true;
         });
-    print(_showEditor);
 
     // Some code to get back code from the picture
     // var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
@@ -91,7 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
     //     .then((response) => setState(() {
     //       _image = null;
     //       this._showEditor = true;
-    //       print('response is $response');
     //       _controller.text = response.toString();
     //       print('controller text is ${_controller.text}')
     //       _text = response.toString();}))
@@ -99,20 +96,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
-  submitCode() async{
-    Dio dio = new Dio();
-    FormData formdata = new FormData.from({
-      "file": new UploadFileInfo(_image, _image.path)
-    });
+  submitCode(String response) async{
+    // Dio dio = new Dio();
+    // FormData formdata = new FormData.from({
+    //   "file": new UploadFileInfo(_image, _image.path)
+    // });
 
-    var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
-        method: 'POST',
-        responseType: ResponseType.PLAIN // or ResponseType.JSON
-    ))
-        .then((response) => setState(() {
-          _image = null;
-          _text = response.toString();}))
-        .catchError((error) => print(error));
+    // var response = await dio.post('http://35.208.187.194', data: formdata, options: Options(
+    //     method: 'POST',
+    //     responseType: ResponseType.PLAIN // or ResponseType.JSON
+    // ))
+    //     .then((response) => setState(() {
+    //       _image = null;
+    //       _text = response.toString();}))
+    //     .catchError((error) => print(error));
   }
 
 
@@ -144,12 +141,12 @@ class _MyHomePageState extends State<MyHomePage> {
 //        actions: <Widget>[
 //          FlatButton(child: Icon(Icons.photo, color: Colors.white), splashColor: Colors.white, highlightColor: Colors.white, onPressed: getPic)
 //        ],
-      )
+      ),
       body: new Center(
 
         child: _showEditor == true ? TextFormField(
           onFieldSubmitted: (String response){
-            print('submitted text: $response');
+            submitCode(response);
           },
           controller: _controller,
           focusNode: _focusNode,

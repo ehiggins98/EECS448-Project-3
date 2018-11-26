@@ -1,5 +1,10 @@
 import unittest
 import context
+import logging
+import sys
+
+
+
 
 starting_chars = "[A-z$]"
 non_starting_chars = starting_chars + "|\\d"
@@ -9,10 +14,13 @@ binary_operator_chars = '&|\||-|\+|\/|\*|>|<|!|=|%'
 
 class TestFunction(unittest.TestCase):
     def setUp(self):
+        
         self.function = context.Function({})
 
     def test_should_return_correct_initial_characters(self):
+        
         valid = self.function.get_valid_characters()
+        
         self.assertEqual(starting_chars, valid)
 
     def test_should_return_correct_noninitial_characters(self):
@@ -696,5 +704,18 @@ class TestAuxiliaryFlag(unittest.TestCase):
         result = self.flag.to_string()
         self.assertEqual('return', result)
 
-if __name__ == '__main__':
-    unittest.main()
+
+def main():
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestFunction)
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestVariableDeclaration)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestAuxiliaryFlag)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestConditional)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestExpression)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestForLoop)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestScope)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestFunctionCall)])
+    suite.addTests([unittest.TestLoader().loadTestsFromTestCase(TestWhileLoop)])
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    
+    
+main()

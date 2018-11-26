@@ -74,7 +74,11 @@ def process_image():
             prob2 = find_probs(index, 1, probabilities)
             prob3 = find_probs(index, 2, probabilities)
             prob4 = find_probs(index, 3, probabilities)
-            char = lookahead(parser, probabilities[index], prob2, prob3, prob4)
+
+            try:
+                char = lookahead(parser, probabilities[index], prob2, prob3, prob4)
+            except:
+                return parser.to_string()
 
             print(index, char)
             cv2.imwrite('test' + str(index) + '.jpg', (np.reshape(c_img, (32, 32, 1)) + 0.13147026078678872) * 255)

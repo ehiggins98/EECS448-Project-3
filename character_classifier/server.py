@@ -53,7 +53,8 @@ def decode(index):
 @app.route('/', methods=['POST'])
 def process_image():
     parser = context.Scope({})
-    data = request.get_data()
+    data = request.files['file']
+    data = data.read()
     file_bytes = np.asarray(bytearray(data), dtype=np.uint8)
     img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
     cv2.imwrite('testFile.jpg', img)

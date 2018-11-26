@@ -1,16 +1,6 @@
 import re
 import copy
 
-"""
-TODO:
-+=, -=, *=, /=
-Save type of token (function or variable) to improve accuracy on function calls
-Make it a bit more resilient to invalid tokens in expressions and such
-Setting properties to functions
-Array literals
-Object literals
-"""
-
 starting_chars = "[A-z$]"
 non_starting_chars = starting_chars + "|\\d"
 context_headers = ['function', 'for', 'while', 'if', 'elseif', 'else']
@@ -78,6 +68,8 @@ class Scope:
             if len(split) > 1:
                 last = split[len(split)-1]
                 if last == '':
+                    if split[0] == 'console':
+                        return 'l'
                     return starting_chars
                 else:
                     tokens = set()
@@ -89,10 +81,11 @@ class Scope:
                             current[t] = {}
                             current = current[t]
 
+
                     partial = set([c[len(last)] for c in current.keys() if c.startswith(last) and len(c) > len(last)])
                     full = set([c for c in current.keys() if c == last])
-                    if partial and not full and len(last) > 2:
-                        tokens += partial
+                    if partial and not full and (len(last) > 2 or split[0] == 'console'):
+                        tokens.update(partial)
                     elif full:
                         tokens.add('=')
                         tokens.add('\.')
@@ -109,11 +102,13 @@ class Scope:
                     tokens.add('{')
                     tokens.add('i')
                 if self.current_token in self.token_dict.keys():
-                    tokens.add('\(')
                     tokens.add('\.')
-                    tokens.add('=')
-                    tokens.add('\+')
-                    tokens.add('-')
+
+                    if self.current_token != 'console':
+                        tokens.add('\(')
+                        tokens.add('=')
+                        tokens.add('\+')
+                        tokens.add('-')
                 if 'e' in tokens and not self.current_token and (not self.scopes or not isinstance(self.scopes[-1], Conditional)):
                     tokens.remove('e')
                 appended = '|\}' if self.current_token == '' and self.needs_closed_brace else ''
@@ -348,7 +343,7 @@ class Expression:
             return binary_operator_chars
 
         if not self.value and self.require_token_initially:
-            return self.get_token_chars(False)
+            return self.get_token_chars(False)[1:]
         if last == "" or last in binary_operator_chars and last:
             second_last = "" if len(self.value) < 2 else self.value[-2]
             if second_last not in '&|' and last in '&|':
@@ -543,9 +538,10 @@ class ForLoop:
         new.body_open = self.body_open
         new.started = self.started
         new.header_complete = self.header_complete
-        new.initializer = self.initializer if isinstance(self.initializer, str) else self.initializer.clone()
+        new.initializer = self.initializer if isinstance(self.initializer, str) or not self.initializer else self.initializer.clone()
         new.condition = None if not self.condition else self.condition.clone()
         new.increment = None if not self.increment else self.increment.clone()
+        new.body = None if not self.body else self.body.clone()
         return new
 
     def get_valid_characters(self):
@@ -600,11 +596,19 @@ class ForLoop:
             self.header_complete = self.increment.put_character(character) and character == ')'
         elif self.body:
             return self.body.put_character(character)
-
         return False
 
     def to_string(self):
-        return 'for(' + self.initializer.to_string() + '; ' + self.condition.to_string() + ' ' + self.increment.to_string() + '{\n' + self.body.to_string() + '\n}'
+        initializer_string = ''
+        if isinstance(self.initializer, str):
+            initializer_string = self.initializer
+        elif isinstance(self.initializer, VariableDeclaration):
+            initializer_string = self.initializer.to_string()
+
+        condition_string = '' if not self.condition else self.condition.to_string()
+        increment_string = '' if not self.increment else self.increment.to_string()
+        body_string = '' if not self.body else self.body.to_string()
+        return 'for(' + initializer_string + '; ' + condition_string + ' ' + increment_string + '{\n' + body_string + '\n}'
 
     def could_be_token(self, str):
         return any([c.startswith(str) for c in self.token_dict.keys()] + [str.startswith(c) for c in self.token_dict.keys()])

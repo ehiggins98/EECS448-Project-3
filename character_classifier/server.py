@@ -27,7 +27,6 @@ def encode(char):
     return mappings[char]
 
 def list_from_regex(regex_str):
-    print(regex_str)
     if regex_str[0] == '|':
         regex_str = regex_str[1:]
 
@@ -55,18 +54,91 @@ def process_image():
     #returns [n, 93] matrix of probabilities
     probabilities = classifier.predict(char_images)
 
-    for index, c_img in enumerate(char_images):
+    for index in range(0, 22):
+        c_img = char_images[index]
         if np.max(c_img) == 0 or math.isnan(np.max(c_img)):
             parser.put_character('\n')
         else:
-            valid = parser.get_valid_characters()
-            valid = list_from_regex(valid)
-
-            # this is a vector of probabilities including only the syntactically-valid characters at this point in the code
+            valid = list_from_regex(parser.get_valid_characters())
             valid_prob = np.take(probabilities[index], valid)
-            char = valid[np.argmax(valid_prob)]
-            char = decode(char)
-            cv2.imwrite('test' + str(index) + '.jpg', (np.reshape(c_img, (32, 32, 1))+0.13147026078678872)*255)
+            prob2 = find_probs(index, 1, probabilities)
+            prob3 = find_probs(index, 2, probabilities)
+            prob4 = find_probs(index, 3, probabilities)
+
+            try:
+                char = lookahead(parser, probabilities[index], prob2, prob3, prob4)
+            except:
+                return parser.to_string()
+
             print(index, char)
+            cv2.imwrite('test' + str(index) + '.jpg', (np.reshape(c_img, (32, 32, 1)) + 0.13147026078678872) * 255)
             parser.put_character(char)
     return parser.to_string()
+
+def find_probs(start, offset, probabilities):
+    count = 0
+    for i in range(start + 1, np.shape(probabilities)[0]):
+        if not all(np.isnan(probabilities[i])) and not all(probabilities[i] == 0):
+            count += 1
+        if count == offset:
+            return probabilities[i]
+    return []
+
+def aggregate(p):
+    arr = np.array(p)
+    median = np.median(arr)
+    std = np.std(arr)
+
+    final = 1
+    for e in p:
+        if e - median < 1.5 * std:
+            final *= e
+    return final
+
+def lookahead(context, prob1, prob2, prob3, prob4):
+    max = 0
+    argmax = 0
+    greatest_n_elem = 5
+    valid1 = list_from_regex(context.get_valid_characters())
+    valid_prob1 = np.take(prob1, valid1)
+    greatest_n1 = range(0, len(valid_prob1)) if len(valid_prob1) < greatest_n_elem else np.argpartition(valid_prob1, -greatest_n_elem)[-greatest_n_elem:]
+    valid1 = np.take(valid1, greatest_n1)
+    valid_prob1 = np.take(valid_prob1, greatest_n1)
+    print(valid1)
+    if not len(prob2): prob2 = [1]
+    if not len(prob3): prob3 = [1]
+    if not len(prob4): prob4 = [1]
+
+    for i1, p1 in enumerate(valid_prob1):
+        working1 = context.clone()
+        working1.put_character(decode(valid1[i1]))
+        valid2 = list_from_regex(working1.get_valid_characters())
+        valid_prob2 = np.take(prob2, valid2)
+        greatest_n2 = range(0, len(valid_prob2)) if len(valid_prob2) < greatest_n_elem else np.argpartition(valid_prob2, -greatest_n_elem)[-greatest_n_elem:]
+        valid2 = np.take(valid2, greatest_n2)
+        valid_prob2 = np.take(valid_prob2, greatest_n2)
+        for i2, p2 in enumerate(valid_prob2):
+            working2 = working1.clone()
+            working2.put_character(decode(valid2[i2]))
+            valid3 = list_from_regex(working2.get_valid_characters())
+            valid_prob3 = np.take(prob3, valid3)
+            greatest_n3 = range(0, len(valid_prob3)) if len(valid_prob3) < greatest_n_elem else np.argpartition(valid_prob3, -greatest_n_elem)[-greatest_n_elem:]
+            valid3 = np.take(valid3, greatest_n3)
+            valid_prob3 = np.take(valid_prob3, greatest_n3)
+            for i3, p3 in enumerate(valid_prob3):
+                working3 = working2.clone()
+                working3.put_character(decode(valid3[i3]))
+                try:
+                    valid4 = list_from_regex(working3.get_valid_characters())
+                except:
+                    print(decode(valid1[i1]), decode(valid2[i2]), decode(valid3[i3]))
+                valid_prob4 = np.take(prob4, valid4)
+                greatest_n4 = range(0, len(valid_prob4)) if len(valid_prob4) < greatest_n_elem else np.argpartition(valid_prob4, -greatest_n_elem)[-greatest_n_elem:]
+                valid4 = np.take(valid4, greatest_n4)
+                valid_prob4 = np.take(valid_prob4, greatest_n4)
+                for i4, p4 in enumerate(valid_prob4):
+                    print(decode(valid1[i1]), decode(valid2[i2]), decode(valid3[i3]), decode(valid4[i4]), p1, p2, p3, p4, aggregate([p1, p2, p3, p4]))
+                    if aggregate([p1, p2, p3, p4]) > max:
+                        max = aggregate([p1, p2, p3, p4])
+                        argmax = decode(valid1[i1])
+    return argmax

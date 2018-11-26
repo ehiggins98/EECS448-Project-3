@@ -254,6 +254,10 @@ class TestScope(unittest.TestCase):
         self.put_string('letx=7;if(true){console.log(x);}')
         self.assertTrue('e' in self.scope.get_valid_characters())
 
+    def test_should_return_correct_characters_after_else(self):
+        self.put_string('if(true){console.log(\'x\');}else')
+        self.assertTrue('{' in self.scope.get_valid_characters())
+
     def put_string(self, str):
         for c in str:
             self.scope.put_character(c)
@@ -424,6 +428,10 @@ class TestExpression(unittest.TestCase):
         exp.put_character('x')
         valid = exp.get_valid_characters()
         self.assertTrue('%' in valid)
+
+    def test_should_be_able_to_use_parenthesis_number(self):
+        self.put_string('(0')
+        self.assertTrue(self.exp.get_valid_characters())
 
     def put_string(self, str):
         for c in str:

@@ -13,7 +13,7 @@ Object literals
 
 starting_chars = "[A-z$]"
 non_starting_chars = starting_chars + "|\\d"
-context_headers = ['function', 'for', 'while', 'if', 'else if', 'else']
+context_headers = ['function', 'for', 'while', 'if', 'elseif', 'else']
 declaration_flags = ['var', 'let', 'const']
 auxiliary_flags = ['return', 'break']
 literal_starting_chars = '\'|t|f|\d|-'
@@ -64,6 +64,14 @@ class Scope:
         if 'console' not in self.token_dict:
             self.token_dict['console'] = {'log': {}}
 
+    def clone(self):
+        new = Scope(self.token_dict, self.needs_closed_brace)
+        new.scope_open = self.scope_open
+        new.current_token = self.current_token
+        for s in self.scopes:
+            new.scopes.append(s.clone())
+        return new
+
     def get_valid_characters(self):
         if not self.scope_open:
             split = self.current_token.split('.')
@@ -97,7 +105,9 @@ class Scope:
                 tokens += [c[len(self.current_token)] for c in declaration_flags if c.startswith(self.current_token) and len(c) > len(self.current_token)]
                 tokens += [c[len(self.current_token)] for c in auxiliary_flags if c.startswith(self.current_token) and len(c) > len(self.current_token)]
                 tokens = set(tokens + [c[len(self.current_token)] for c in self.token_dict.keys() if c.startswith(self.current_token) and len(c) > len(self.current_token)])
-
+                if self.current_token == 'else':
+                    tokens.add('{')
+                    tokens.add('i')
                 if self.current_token in self.token_dict.keys():
                     tokens.add('\(')
                     tokens.add('\.')
@@ -107,7 +117,7 @@ class Scope:
                 if 'e' in tokens and not self.current_token and (not self.scopes or not isinstance(self.scopes[-1], Conditional)):
                     tokens.remove('e')
                 appended = '|\}' if self.current_token == '' and self.needs_closed_brace else ''
-                return ('|'.join(tokens) + appended).replace('+', '\+')
+                return ('|'.join(tokens) + appended)
         else:
             valid = self.scopes[len(self.scopes) - 1].get_valid_characters()
             if isinstance(self.scopes[len(self.scopes) - 1], Expression) and self.scopes[len(self.scopes) - 1].complete():
@@ -195,6 +205,13 @@ class VariableDeclaration:
         self.value = None
         self.named = False
 
+    def clone(self):
+        new = VariableDeclaration(self.type, self.token_dict)
+        new.name = copy.deepcopy(self.name)
+        new.named = self.named
+        new.value = None if not self.value else self.value.clone()
+        return new;
+
     def get_valid_characters(self):
         if self.name[len(self.name)-1] == "":
             appended = "|=" if len(self.name) > 1 else ""
@@ -242,6 +259,16 @@ class Function:
         self.body = None
         self.named = False
         self.parameterized = False
+
+    def clone(self):
+        new = Function(self.token_dict)
+        new.params = copy.deepcopy(self.params)
+        new.parent_tokens = self.parent_tokens
+        new.name = self.name
+        new.body = None if not self.body else self.body.clone()
+        new.named = self.named
+        new.parameterized = self.parameterized
+        return new
 
     def get_valid_characters(self):
         if not self.named:
@@ -303,6 +330,13 @@ class Expression:
         self.require_token_initially = require_token_initially
         self.reset = True
 
+    def clone(self):
+        new = Expression(self.token_dict, self.require_semicolon, self.require_token_initially)
+        new.value = self.value
+        new.current_symbol = self.current_symbol
+        new.reset = self.reset
+        return new
+
     def get_valid_characters(self):
         last = "" if len(self.value) == 0 else self.value[len(self.value)-1]
 
@@ -315,14 +349,17 @@ class Expression:
 
         if not self.value and self.require_token_initially:
             return self.get_token_chars(False)
-        if last == "" or last in binary_operator_chars:
+        if last == "" or last in binary_operator_chars and last:
+            second_last = "" if len(self.value) < 2 else self.value[-2]
+            if second_last not in '&|' and last in '&|':
+                return '&' if last == '&' else '\|'
             possible_operators = '|'.join(set([c[1] for c in binary_operators + both_sides_operators if c.startswith(last) and len(c) > 1 and len(last) > 0]))
             possible_operators = possible_operators.replace('+', '\+')
             if len(possible_operators) > 0: possible_operators = '|' + possible_operators
             return literal_starting_chars + "|\(|!" + possible_operators + self.get_token_chars(True)
 
         if self.symbol_complete() and self.current_symbol not in binary_operators:
-            operators = binary_operator_chars if self.reset else '&|\||'
+            operators = binary_operator_chars if self.reset else '&|\|'
             literals = self.get_literal_chars()
             return operators + ('|' if literals else '') + literals + "|\)|;|\n|\."
 
@@ -386,6 +423,7 @@ class Expression:
         complete = len(self.current_symbol) > 0 and literal_complete(get_literal_type(self.current_symbol[0]), self.current_symbol)
         complete = complete or self.current_symbol in self.token_dict.keys()
         complete = complete or self.current_symbol in binary_operators
+        complete = complete or self.current_symbol in '()'
         complete = complete or self.current_symbol == '!' or self.current_symbol in ';\n' or self.current_symbol == ')'
         complete = complete or ((last_two == '++' or last_two == '--') and third_to_last not in binary_operator_chars)
         return complete
@@ -400,6 +438,16 @@ class Conditional:
         self.body = Scope(self.token_dict, True)
         self.type = type
         self.last_char = ""
+
+    def clone(self):
+        new = Conditional(self.type, self.token_dict)
+        new.condition = self.condition.clone()
+        new.started = self.started
+        new.condition_open = self.condition_open
+        new.body_open = self.body_open
+        new.body = self.body.clone()
+        new.last_char = self.last_char
+        return new
 
     def get_valid_characters(self):
         if not self.condition_open and not self.body_open:
@@ -441,6 +489,16 @@ class WhileLoop:
         self.started = False
         self.last_char = ""
 
+    def clone(self):
+        new = WhileLoop(self.token_dict)
+        new.condition = self.condition.clone()
+        new.body = self.body.clone()
+        new.condition_open = self.condition_open
+        new.body_open = self.body_open
+        new.started = self.started
+        new.last_char = self.last_char
+        return new
+
     def get_valid_characters(self):
         if not self.condition_open and not self.body_open and not self.started:
             return '\('
@@ -479,6 +537,16 @@ class ForLoop:
         self.condition = None
         self.increment = None
         self.body = None
+
+    def clone(self):
+        new = ForLoop(self.token_dict)
+        new.body_open = self.body_open
+        new.started = self.started
+        new.header_complete = self.header_complete
+        new.initializer = self.initializer if isinstance(self.initializer, str) else self.initializer.clone()
+        new.condition = None if not self.condition else self.condition.clone()
+        new.increment = None if not self.increment else self.increment.clone()
+        return new
 
     def get_valid_characters(self):
         if not self.initializer and not self.condition and not self.increment and not self.body and not self.started:
@@ -571,6 +639,13 @@ class FunctionCall:
         self.params = []
         self.comma = False
 
+    def clone(self):
+        new = FunctionCall(self.token_dict)
+        new.name = self.name
+        new.params = copy.deepcopy(self.params)
+        new.comma = self.comma
+        return new
+
     def get_valid_characters(self):
         if not self.params:
             result = set([c[len(self.name)] for c in self.token_dict.keys() if c.startswith(self.name) and len(c) > len(self.name)])
@@ -608,6 +683,11 @@ class AuxiliaryFlag:
     def __init__(self, type, token_dict):
         self.type = type
         self.value = Expression(token_dict, False, False) if type == 'return' else None
+
+    def clone(self):
+        new = AuxiliaryFlag(self.type, self.token_dict)
+        new.value = None if not self.value else self.value.clone()
+        return new
 
     def get_valid_characters(self):
         if not self.value:

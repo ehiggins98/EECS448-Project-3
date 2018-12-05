@@ -84,6 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future takePic() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    print("image is $image");
     var text;
 
 
@@ -118,7 +119,6 @@ class _MyHomePageState extends State<MyHomePage> {
            _image = null;
            this._showEditor = true;
            _controller.text = response.toString();
-           print('controller text is ${_controller.text}');
 
            }))
          .catchError((error) => print(error));
@@ -167,6 +167,8 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _image = image;
     });
+
+    showEditor();
   }
 
   @override

@@ -1,10 +1,25 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/zkulphong/Desktop/EECS448-Project-3/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-v24/values-v24.xml",
+            "outputFile": "C:\\Users\\zkulphong\\Desktop\\EECS448-Project-3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v24\\values-v24.xml",
             "map": [
                 {
-                    "source": "/Users/zkulphong/.gradle/caches/transforms-1/files-1.1/support-media-compat-27.1.1.aar/69ab4dcf144534895ac1ee25909653e6/res/values-v24/values-v24.xml",
+                    "source": "C:\\Users\\zkulphong\\.gradle\\caches\\transforms-1\\files-1.1\\support-media-compat-27.1.1.aar\\69ab4dcf144534895ac1ee25909653e6\\res\\values-v24\\values-v24.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,121,182,248",
+                        "endColumns": "65,60,65,66",
+                        "endOffsets": "116,177,243,310"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "C:\\Users\\joshh\\Documents\\EECS 448 Labs and Projects\\EECS448-Project-3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v24\\values-v24.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\joshh\\.gradle\\caches\\transforms-1\\files-1.1\\support-media-compat-27.1.1.aar\\df43af0f6c39c9c57fae0ed7f7a1d2d6\\res\\values-v24\\values-v24.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

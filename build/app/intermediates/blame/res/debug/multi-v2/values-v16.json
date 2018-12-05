@@ -1,10 +1,25 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/zkulphong/Desktop/EECS448-Project-3/build/app/intermediates/incremental/mergeDebugResources/merged.dir/values-v16/values-v16.xml",
+            "outputFile": "C:\\Users\\zkulphong\\Desktop\\EECS448-Project-3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v16\\values-v16.xml",
             "map": [
                 {
-                    "source": "/Users/zkulphong/.gradle/caches/transforms-1/files-1.1/support-compat-27.1.1.aar/c4e60d9bcf35fed413fffdec62f2bb79/res/values-v16/values-v16.xml",
+                    "source": "C:\\Users\\zkulphong\\.gradle\\caches\\transforms-1\\files-1.1\\support-compat-27.1.1.aar\\c4e60d9bcf35fed413fffdec62f2bb79\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "C:\\Users\\joshh\\Documents\\EECS 448 Labs and Projects\\EECS448-Project-3\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v16\\values-v16.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\joshh\\.gradle\\caches\\transforms-1\\files-1.1\\support-compat-27.1.1.aar\\287be10779302f574ba30ab6f1482204\\res\\values-v16\\values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

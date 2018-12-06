@@ -1,3 +1,6 @@
+"""
+Unit tests for the context parsing algorithm.
+"""
 import unittest
 import context
 import logging

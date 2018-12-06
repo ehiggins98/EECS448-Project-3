@@ -1,0 +1,286 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Text Detection &#8212; Project 4 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Test Context" href="test_context.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="text-detection">
+<h1>Text Detection<a class="headerlink" href="#text-detection" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-textdetection"></span><p>The algorithm for extracting characters from an image and sorting them into lines.</p>
+<dl class="class">
+<dt id="textdetection.TextDetection">
+<em class="property">class </em><code class="descclassname">textdetection.</code><code class="descname">TextDetection</code><a class="headerlink" href="#textdetection.TextDetection" title="Permalink to this definition">¶</a></dt>
+<dd><p>The algorithm for extracting characters from an image and sorting them into lines.</p>
+<dl class="method">
+<dt id="textdetection.TextDetection.boxCharacters">
+<code class="descname">boxCharacters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.boxCharacters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filters the image by color, gets bounding boxes for each contour, and adds them to <cite>self.listRect</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.combineVertical">
+<code class="descname">combineVertical</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.combineVertical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines contours that are vertically above each other. This ensures that characters like ‘:’ and ‘;’ are
+read correctly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.cutImages">
+<code class="descname">cutImages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.cutImages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performes final processing on the images. This includes centering them in the minimally-sized image such
+that all characters fit in it, applying a Gaussian blur, downscaling the image to [32, 32], and normalizing
+the image by dividing by the max value (255) and subtracting the mean.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of the fully-processed images.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.deleteBoxinBox">
+<code class="descname">deleteBoxinBox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.deleteBoxinBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes any contour bounding boxes that are completely contained in another box. This is an issue with
+characters like ‘o’ and ‘B’.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><em>img</em><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>The entry point for the algorithm. Executes the entire algorithm and returns the result.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>img</strong> (<em>np.ndarray</em>) – the image from which to parse characters.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of character images found in the image.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.genLists">
+<code class="descname">genLists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.genLists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorts the character bounding boxes in <cite>self.listRect</cite> into lines. The sorted list is assigned to
+<cite>self.listLines</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.get_box_specs">
+<code class="descname">get_box_specs</code><span class="sig-paren">(</span><em>box</em>, <em>dim</em><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.get_box_specs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the x and y offset necessary to center <cite>box</cite> in an image of size [dim, dim]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>box</strong> (<em>(</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>)</em>) – The bounding box to consider, represented as a quadruple (x, y, width, height).</li>
+<li><strong>dim</strong> (<em>int</em>) – The max image size to consider.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A tuple containing (x_offset, y_offset, width, height).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.onSameLine">
+<code class="descname">onSameLine</code><span class="sig-paren">(</span><em>box1</em>, <em>box2</em><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.onSameLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value indicating whether <cite>box1</cite> and <cite>box2</cite> are on the same line of text.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>box1</strong> (<em>(</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>)</em>) – The first box, represented as a quadruple (x, y, width, height)</li>
+<li><strong>box2</strong> (<em>(</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>)</em>) – The second box, represented as a quadruple (x, y, width, height)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A value indicating whether <cite>box1</cite> and <cite>box2</cite> are on the same line of text.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.recurseNext">
+<code class="descname">recurseNext</code><span class="sig-paren">(</span><em>index</em>, <em>array</em><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.recurseNext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively groups characters on the same line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – The index in <cite>self.listRect</cite> from which to recurse.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.setRecurse">
+<code class="descname">setRecurse</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.setRecurse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a recursive algorithm to group characters on the same line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – The index in <cite>self.listRect</cite> at which to begin.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.sortLines">
+<code class="descname">sortLines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.sortLines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorts lines by their y value, such that the line with the lowest y value is first.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.sortListLines">
+<code class="descname">sortListLines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.sortListLines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorts lines such that the line with the lowest y value is first, etc.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.verticalOverlap">
+<code class="descname">verticalOverlap</code><span class="sig-paren">(</span><em>box1</em>, <em>box2</em><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.verticalOverlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value indicating whether <cite>box1</cite> and <cite>box2</cite> overlap vertically.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>box1</strong> (<em>(</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>)</em>) – The first box, represented as a quadruple (x, y, width, height)</li>
+<li><strong>box2</strong> (<em>(</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>)</em>) – The second box, represented as a quadruple (x, y, width, height)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A value indicating whether <cite>box1</cite> and <cite>box2</cite> overlap vertically.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="textdetection.TextDetection.writeRectsToImage">
+<code class="descname">writeRectsToImage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#textdetection.TextDetection.writeRectsToImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes bounding boxes for each line of text an image and writes it to the disk, for testing purposes.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="classifier.html">Classifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="context.html">Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="filter.html">Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="human_benchmarker.html">Human Benchmarker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input.html">Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_classifier_manual.html">Test Classifier Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_context_manual.html">Test Context Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_context.html">Test Context</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Text Detection</a><ul class="simple">
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="test_context.html" title="previous chapter">Test Context</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/textdetection.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Eric Higgins, Josh High, Zak Kulphongpatana.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/textdetection.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,3 +1,6 @@
+"""
+The algorithm for extracting characters from an image and sorting them into lines.
+"""
 #!/usr/bin/python
 
 import sys
@@ -10,8 +13,17 @@ import numpy as np
 import filter
 
 class TextDetection:
+    """
+    The algorithm for extracting characters from an image and sorting them into lines.
+    """
     def execute(self, img):
-        
+        """
+        The entry point for the algorithm. Executes the entire algorithm and returns the result.
+
+        :param img: the image from which to parse characters.
+        :type img: np.ndarray
+        :returns: A list of character images found in the image.
+        """
         self.listRect = []
         self.listLines = []
         self.listImages = []
@@ -28,6 +40,9 @@ class TextDetection:
    # KEEP
 
     def boxCharacters(self):
+        """
+        Filters the image by color, gets bounding boxes for each contour, and adds them to `self.listRect`.
+        """
         f = filter.ColorFilter()
         img = f.process(self.img)
         self.img = img
@@ -47,6 +62,9 @@ class TextDetection:
     # KEEP
 
     def writeRectsToImage(self):
+        """
+        Writes bounding boxes for each line of text an image and writes it to the disk, for testing purposes.
+        """
         vis = self.img.copy()
         counter = 0
         for line in self.listLines:
@@ -68,6 +86,15 @@ class TextDetection:
         cv.imwrite('outputNewRun5.jpg', vis)
 
     def onSameLine(self, box1, box2):
+        """
+        Gets a value indicating whether `box1` and `box2` are on the same line of text.
+
+        :param box1: The first box, represented as a quadruple (x, y, width, height)
+        :type box1: (int, int, int, int)
+        :param box2: The second box, represented as a quadruple (x, y, width, height)
+        :type box2: (int, int, int, int)
+        :returns: A value indicating whether `box1` and `box2` are on the same line of text.
+        """
         x1, y1, w1, h1 = box1
         x2, y2, w2, h2 = box2
         upperBound = max(y1, y2)
@@ -81,6 +108,15 @@ class TextDetection:
             return False
 
     def verticalOverlap(self, box1, box2):
+        """
+        Gets a value indicating whether `box1` and `box2` overlap vertically.
+
+        :param box1: The first box, represented as a quadruple (x, y, width, height)
+        :type box1: (int, int, int, int)
+        :param box2: The second box, represented as a quadruple (x, y, width, height)
+        :type box2: (int, int, int, int)
+        :returns: A value indicating whether `box1` and `box2` overlap vertically.
+        """
         x1, y1, w1, h1 = box1
         x2, y2, w2, h2 = box2
         upperBound = max(x1, x2)
@@ -94,6 +130,10 @@ class TextDetection:
             return False
 
     def combineVertical(self):
+        """
+        Combines contours that are vertically above each other. This ensures that characters like ':' and ';' are
+        read correctly.
+        """
         for line in self.listLines:
             # print(line)
             addToLine = []
@@ -125,12 +165,22 @@ class TextDetection:
 
     # KEEP
     def genLists(self):
+        """
+        Sorts the character bounding boxes in `self.listRect` into lines. The sorted list is assigned to
+        `self.listLines`.
+        """
         setLines = []
         while len(self.listRect) > 0:
             setLines.append(self.setRecurse(0))
         self.listLines = setLines
 
     def setRecurse(self, index):
+        """
+        Initializes a recursive algorithm to group characters on the same line.
+
+        :param index: The index in `self.listRect` at which to begin.
+        :type index: int
+        """
         line = []
         startingBox = self.listRect[index]
         line.append(startingBox)
@@ -148,6 +198,12 @@ class TextDetection:
         return(line)
 
     def recurseNext(self, index, array):
+        """
+        Recursively groups characters on the same line.
+
+        :param index: The index in `self.listRect` from which to recurse.
+        :type index: int
+        """
         startingBox = self.listRect[index]
         for box2 in self.listRect:
             if box2 != startingBox and self.listRect.index(box2) != self.listRect.index(startingBox):
@@ -160,6 +216,9 @@ class TextDetection:
 
     # KEEP
     def sortListLines(self):
+        """
+        Sorts lines such that the line with the lowest y value is first, etc.
+        """
         averageYs = []
         sortedListofLines = []
         for line in self.listLines:
@@ -180,6 +239,10 @@ class TextDetection:
     # KEEP
 
     def deleteBoxinBox(self):
+        """
+        Deletes any contour bounding boxes that are completely contained in another box. This is an issue with
+        characters like 'o' and 'B'.
+        """
         for box1 in self.listRect:
             for box2 in self.listRect:
                 if box1 != box2 and self.listRect.index(box1) != self.listRect.index(box2):
@@ -189,10 +252,22 @@ class TextDetection:
                         self.listRect.remove(box2)
 
     def sortLines(self):
+        """
+        Sorts lines by their y value, such that the line with the lowest y value is first.
+        """
         for line in self.listLines:
             line.sort(key=lambda tup: tup[0])
 
     def get_box_specs(self, box, dim):
+        """
+        Gets the x and y offset necessary to center `box` in an image of size [dim, dim]
+
+        :param box: The bounding box to consider, represented as a quadruple (x, y, width, height).
+        :type box: (int, int, int, int)
+        :param dim: The max image size to consider.
+        :type dim: int
+        :returns: A tuple containing (x_offset, y_offset, width, height).
+        """
         x, y, w, h = box
         yDiff = int((dim - h)/2)
         xDiff = int((dim - w)/2)
@@ -208,6 +283,13 @@ class TextDetection:
         return xDiff, yDiff, w, h
 
     def cutImages(self):
+        """
+        Performes final processing on the images. This includes centering them in the minimally-sized image such
+        that all characters fit in it, applying a Gaussian blur, downscaling the image to [32, 32], and normalizing
+        the image by dividing by the max value (255) and subtracting the mean.
+
+        :returns: A list of the fully-processed images.
+        """
         listImages = []
         maxDimension = 0
         maxLine = -1

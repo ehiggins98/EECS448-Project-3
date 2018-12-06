@@ -1,3 +1,7 @@
+"""
+A Flask server that takes an image, processes text in it, and returns the result.
+"""
+
 import context
 import classifier
 import textdetection as td
@@ -11,7 +15,6 @@ import math
 import test_context
 
 import subprocess
-
 
 app = Flask(__name__)
 classifier = classifier.Model()
@@ -33,9 +36,19 @@ similar = {
 }
 
 def encode(char):
+    """
+    Encodes a character as the corresponding class value.
+    """
     return mappings[char]
 
 def list_from_regex(regex_str):
+    """
+    Creates a list of valid characters given a regular expression.
+
+    :param regex_str: The regex for which to get a list.
+    :type regex_str: string
+    :returns: A list of characters accepted by the given regex.
+    """
     if regex_str[0] == '|':
         regex_str = regex_str[1:]
 
@@ -47,11 +60,22 @@ def list_from_regex(regex_str):
     return result
 
 def decode(index):
+    """
+    Decodes a character class value to its corresponding character.
+
+    :param index: The character class value to decode.
+    :type index: int
+    :returns: The character corresponding to the given class value, or `None` if the given class is invalid.
+    """
     for k, v in mappings.items():
         if v == index: return k
 
 @app.route('/', methods=['POST'])
 def process_image():
+    """
+    Receives an image from an HTTP request and processes the text. The request must have one field titled "file," for which the value is the
+    bnary image.
+    """
     parser = context.Scope({})
     data = request.files['file']
     data = data.read()
@@ -87,6 +111,17 @@ def process_image():
     return parser.to_string()
 
 def find_probs(start, offset, probabilities):
+    """
+    Find the `offset`-th valid probability after `start`.
+
+    :param start: Starts searching for probabilities at the index after this value.
+    :type start: int
+    :param offset: The offset to return. For example, if offset=3, the function will return the 3rd valid probability vector after `start`.
+    :type offset: int
+    :param probabilities: The probability matrix.
+    :type probabilities: np.ndarray
+    :return: The `offset`-th valid probability vector after `start`.
+    """
     count = 0
     for i in range(start + 1, np.shape(probabilities)[0]):
         if not all(np.isnan(probabilities[i])) and not all(probabilities[i] == 0):
@@ -96,6 +131,16 @@ def find_probs(start, offset, probabilities):
     return []
 
 def aggregate(probabilities, chars):
+    """
+    Aggregates several probabilities into a value indicating the likeliness of the given sequence of characters.
+
+    :param probabilities: The list of probabilities to aggregate.
+    :type probabilities: [float]
+    :param chars: The list of characters corresponding to the given probabilities, such that the character at `i` corresponds to the `i`th probability.
+    :type chars: [char]
+    :returns: The aggregated probability.
+    """
+
     final = 1
 
     for p, c in zip(probabilities, chars):
@@ -109,6 +154,15 @@ def aggregate(probabilities, chars):
     return final
 
 def sum_similar(probabilities, character):
+    """
+    Sums probabilities over similar characters. For example, if `character` == 'c', then this might sum probabilities over 'c', 'C', and '<'.
+
+    :param probabilities: The probabilities to sum.
+    :type probabilities: np.ndarray
+    :param character: The character for which to sum similar characters' probabilities.
+    :type character: char
+    :returns: The summed probability.
+    """
     result = probabilities[encode(character)]
     if character in similar:
         for c in similar[character]:
@@ -116,6 +170,21 @@ def sum_similar(probabilities, character):
     return result
 
 def lookahead(context, prob1, prob2, prob3, prob4):
+    """
+    Finds the character that results in the highest probability among it and the next character.
+
+    :param context: The current context in the code.
+    :type context: Scope
+    :param prob1: The probability distribution associated with the current character.
+    :type prob1: np.ndarray
+    :param prob2: The probability distribution associated with the next character.
+    :type prob2: np.ndarray
+    :param prob3: Unused
+    :type prob3: np.ndarray
+    :param prob4: Unused
+    :type prob4: np.ndarray
+    :returns: The current character that maximizes probability over the next two.
+    """
     max = 0
     argmax = 0
     greatest_n_elem = 10
@@ -149,5 +218,8 @@ def lookahead(context, prob1, prob2, prob3, prob4):
 
 @app.route('/', methods=['GET'])
 def runTests():
+    """
+    Runs the test suite and returns the result through an HTTP request.
+    """
     result = subprocess.check_output(['python3', 'test_context.py'], stderr=subprocess.STDOUT)
     return(result)

@@ -1,0 +1,916 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Context &#8212; Project 4 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Filter" href="filter.html" />
+    <link rel="prev" title="Classifier" href="classifier.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="context">
+<h1>Context<a class="headerlink" href="#context" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-context"></span><p>Keeps track of the current context to to allow fetching all valid characters at the current position in the code.</p>
+<dl class="class">
+<dt id="context.AuxiliaryFlag">
+<em class="property">class </em><code class="descclassname">context.</code><code class="descname">AuxiliaryFlag</code><span class="sig-paren">(</span><em>type</em>, <em>token_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#context.AuxiliaryFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a <cite>return</cite> or <cite>break</cite> statement.</p>
+<dl class="method">
+<dt id="context.AuxiliaryFlag.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.AuxiliaryFlag.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deep copy of this <cite>AuxiliaryFlag</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A deep copy of this <cite>AuxiliaryFlag</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.AuxiliaryFlag.get_valid_characters">
+<code class="descname">get_valid_characters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.AuxiliaryFlag.get_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the valid characters at this point in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters at this point in the code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.AuxiliaryFlag.put_character">
+<code class="descname">put_character</code><span class="sig-paren">(</span><em>character</em><span class="sig-paren">)</span><a class="headerlink" href="#context.AuxiliaryFlag.put_character" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a character to the current code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>character</strong> (<em>char</em>) – The character to add.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this expression could be finished.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.AuxiliaryFlag.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.AuxiliaryFlag.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a string representation of this <cite>AuxiliaryFlag</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string representation of this <cite>AuxiliaryFlag</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="context.Conditional">
+<em class="property">class </em><code class="descclassname">context.</code><code class="descname">Conditional</code><span class="sig-paren">(</span><em>type</em>, <em>token_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#context.Conditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a conditional statement in the code, like ‘if’ or ‘else’.</p>
+<dl class="method">
+<dt id="context.Conditional.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Conditional.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deep copy of this conditional statement.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A deep copy of this conditional statement.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Conditional.get_valid_characters">
+<code class="descname">get_valid_characters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Conditional.get_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the valid characters at this point in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters at this point in the code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Conditional.put_character">
+<code class="descname">put_character</code><span class="sig-paren">(</span><em>character</em><span class="sig-paren">)</span><a class="headerlink" href="#context.Conditional.put_character" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a character to the current code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>character</strong> (<em>char</em>) – The character to add.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this expression could be finished.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Conditional.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Conditional.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a string representation of this <cite>Conditional</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string representation of this <cite>Conditional</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="context.Expression">
+<em class="property">class </em><code class="descclassname">context.</code><code class="descname">Expression</code><span class="sig-paren">(</span><em>token_dict</em>, <em>require_semicolon</em>, <em>require_token_initially</em><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents either a boolean or a math expression.</p>
+<dl class="method">
+<dt id="context.Expression.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deep copy of this <cite>Expression</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A deep copy of this <cite>Expression</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Expression.complete">
+<code class="descname">complete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression.complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value indicating whether this <cite>Expression</cite> could be complete.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this <cite>Expression</cite> could be complete.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Expression.empty">
+<code class="descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression.empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value indicating whether this <cite>Expression</cite> is empty</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this <cite>Expression</cite> is empty.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Expression.get_literal_chars">
+<code class="descname">get_literal_chars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression.get_literal_chars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all valid characters assuming the current symbol is part of a literal.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters assuming the current symbol is part of a literal.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Expression.get_token_chars">
+<code class="descname">get_token_chars</code><span class="sig-paren">(</span><em>with_operators</em><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression.get_token_chars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all valid characters assuming the current symbol is part of a token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>with_operators</strong> (<em>boolean</em>) – A value indicating whether ++&lt;token&gt;, &lt;token&gt;++, –&lt;token&gt;, and &lt;token&gt;– should be included.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters assuming the current symbol is part of a token.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Expression.get_valid_characters">
+<code class="descname">get_valid_characters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression.get_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the valid characters at this point in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters at this point in the code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Expression.put_character">
+<code class="descname">put_character</code><span class="sig-paren">(</span><em>character</em><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression.put_character" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a character to the current code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>character</strong> (<em>char</em>) – The character to add.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this expression could be finished.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Expression.symbol_complete">
+<code class="descname">symbol_complete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression.symbol_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value indicating whether the current symbol could be complete.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether the current symbol could be complete.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Expression.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Expression.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a string representation of this <cite>Expression</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string representation of this <cite>Expression</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="context.ForLoop">
+<em class="property">class </em><code class="descclassname">context.</code><code class="descname">ForLoop</code><span class="sig-paren">(</span><em>token_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#context.ForLoop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a for loop.</p>
+<dl class="method">
+<dt id="context.ForLoop.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.ForLoop.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deep copy of this for loop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A deep copy of this for loop.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.ForLoop.could_be_declaration">
+<code class="descname">could_be_declaration</code><span class="sig-paren">(</span><em>str</em><span class="sig-paren">)</span><a class="headerlink" href="#context.ForLoop.could_be_declaration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value indicating whether <cite>str</cite> could be a variable declaration e.g. ‘var x = y’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Params str:</th><td class="field-body">The value to consider.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether <cite>str</cite> could be a variable declaration.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.ForLoop.could_be_token">
+<code class="descname">could_be_token</code><span class="sig-paren">(</span><em>str</em><span class="sig-paren">)</span><a class="headerlink" href="#context.ForLoop.could_be_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value indicating whether <cite>str</cite> could be a token i.e. if a token starts with <cite>str</cite> or <cite>str</cite> starts with a token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Params str:</th><td class="field-body">The value to consider.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether <cite>str</cite> could be a token.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.ForLoop.get_token_chars">
+<code class="descname">get_token_chars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.ForLoop.get_token_chars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all valid characters assuming the current symbol is a token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only valid characters assuming the current symbol is a token.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.ForLoop.get_valid_characters">
+<code class="descname">get_valid_characters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.ForLoop.get_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the valid characters at this point in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters at this point in the code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.ForLoop.name_and_flag">
+<code class="descname">name_and_flag</code><span class="sig-paren">(</span><em>str</em><span class="sig-paren">)</span><a class="headerlink" href="#context.ForLoop.name_and_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the name and flag from <cite>str</cite>. I.e. if <cite>str == ‘var x’</cite> then <cite>name = ‘x’</cite> and <cite>flag == ‘var’</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>str</strong> (<em>string</em>) – The value to consider.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The name and flag extracted from <cite>str</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.ForLoop.put_character">
+<code class="descname">put_character</code><span class="sig-paren">(</span><em>character</em><span class="sig-paren">)</span><a class="headerlink" href="#context.ForLoop.put_character" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a character to the current code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>character</strong> (<em>char</em>) – The character to add.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this expression could be finished.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.ForLoop.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.ForLoop.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a string representation of this for loop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string representation of this for loop.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="context.Function">
+<em class="property">class </em><code class="descclassname">context.</code><code class="descname">Function</code><span class="sig-paren">(</span><em>token_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#context.Function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a function and its declaration, i.e. <a href="#id1"><span class="problematic" id="id2">`</span></a>function a(b, c, d) {}.</p>
+<dl class="method">
+<dt id="context.Function.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Function.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deep copy of the <cite>Function</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A deep copy of the <cite>Function</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Function.get_valid_characters">
+<code class="descname">get_valid_characters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Function.get_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the valid characters at this point in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters at this point in the code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Function.put_character">
+<code class="descname">put_character</code><span class="sig-paren">(</span><em>character</em><span class="sig-paren">)</span><a class="headerlink" href="#context.Function.put_character" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a character to the current code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>character</strong> (<em>char</em>) – The character to add.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this function could be finished.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Function.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Function.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a string representation of this function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string representation of this function.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="context.FunctionCall">
+<em class="property">class </em><code class="descclassname">context.</code><code class="descname">FunctionCall</code><span class="sig-paren">(</span><em>token_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#context.FunctionCall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a function call. E.g. if <cite>x</cite> is a function, <cite>x()</cite> is a <cite>FunctionCall</cite>.</p>
+<dl class="method">
+<dt id="context.FunctionCall.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.FunctionCall.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deep copy of this <cite>FunctionCall</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A deep copy of this <cite>FunctionCall</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.FunctionCall.get_valid_characters">
+<code class="descname">get_valid_characters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.FunctionCall.get_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the valid characters at this point in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters at this point in the code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.FunctionCall.put_character">
+<code class="descname">put_character</code><span class="sig-paren">(</span><em>character</em><span class="sig-paren">)</span><a class="headerlink" href="#context.FunctionCall.put_character" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a character to the current code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>character</strong> (<em>char</em>) – The character to add.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this expression could be finished.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.FunctionCall.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.FunctionCall.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a string representation of this <cite>FunctionCall</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string representation of this <cite>FunctionCall</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="context.Scope">
+<em class="property">class </em><code class="descclassname">context.</code><code class="descname">Scope</code><span class="sig-paren">(</span><em>token_dict</em>, <em>needs_closed_brace=False</em><span class="sig-paren">)</span><a class="headerlink" href="#context.Scope" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents any part of the code that has its own variable scope. For example, the bodies of functions
+and while loops.</p>
+<dl class="method">
+<dt id="context.Scope.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Scope.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deep copy of this scope</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A clone of this scope.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Scope.get_valid_characters">
+<code class="descname">get_valid_characters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Scope.get_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the valid characters at this point in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters in the code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Scope.put_character">
+<code class="descname">put_character</code><span class="sig-paren">(</span><em>character</em><span class="sig-paren">)</span><a class="headerlink" href="#context.Scope.put_character" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a character to the current code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>character</strong> (<em>char</em>) – The character to add.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this scope could be complete.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.Scope.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.Scope.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts this scope to a string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This scope represented as a string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="context.VariableDeclaration">
+<em class="property">class </em><code class="descclassname">context.</code><code class="descname">VariableDeclaration</code><span class="sig-paren">(</span><em>type</em>, <em>token_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#context.VariableDeclaration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a declaration of a variable, such as <cite>let x = 7;</cite></p>
+<dl class="method">
+<dt id="context.VariableDeclaration.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.VariableDeclaration.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deep copy of this <cite>VariableDeclaration</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A deep copy of this <cite>VariableDeclaration</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.VariableDeclaration.could_be_token">
+<code class="descname">could_be_token</code><span class="sig-paren">(</span><em>str</em><span class="sig-paren">)</span><a class="headerlink" href="#context.VariableDeclaration.could_be_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value indicating whether the given string could be a token (i.e. if it’s a prefix of a valid token).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether the given string could be a token.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.VariableDeclaration.full_name">
+<code class="descname">full_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.VariableDeclaration.full_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a string representation of the current <cite>self.name</cite>. For example, if <a href="#id3"><span class="problematic" id="id4">`</span></a>self.name = [‘console’, ‘log’],
+then this will return ‘console.log’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string representation of the current <cite>self.name</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.VariableDeclaration.get_valid_characters">
+<code class="descname">get_valid_characters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.VariableDeclaration.get_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the valid characters at this point in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters at this point in the code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.VariableDeclaration.put_character">
+<code class="descname">put_character</code><span class="sig-paren">(</span><em>character</em><span class="sig-paren">)</span><a class="headerlink" href="#context.VariableDeclaration.put_character" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a character to the current code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>character</strong> (<em>char</em>) – The character to add.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this variable declaration could be finished.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.VariableDeclaration.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.VariableDeclaration.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts this <cite>VariableDeclaration</cite> to a string representation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string representation of this <cite>VariableDeclaration</cite>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.VariableDeclaration.value_is_complete">
+<code class="descname">value_is_complete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.VariableDeclaration.value_is_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value indicating whether the expression to the right of the equal sign could be complete.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether the expression to the right of the equal sign could be complete.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="context.WhileLoop">
+<em class="property">class </em><code class="descclassname">context.</code><code class="descname">WhileLoop</code><span class="sig-paren">(</span><em>token_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#context.WhileLoop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a while loop.</p>
+<dl class="method">
+<dt id="context.WhileLoop.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.WhileLoop.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deep copy of the while loop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A deep copy of the while loop.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.WhileLoop.get_valid_characters">
+<code class="descname">get_valid_characters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.WhileLoop.get_valid_characters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the valid characters at this point in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A regex accepting only the valid characters at this point in the code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.WhileLoop.put_character">
+<code class="descname">put_character</code><span class="sig-paren">(</span><em>character</em><span class="sig-paren">)</span><a class="headerlink" href="#context.WhileLoop.put_character" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a character to the current code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>character</strong> (<em>char</em>) – The character to add.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A value indicating whether this expression could be finished.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="context.WhileLoop.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#context.WhileLoop.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a string representation of the while loop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string representation of the while loop.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="context.filter_alphanumeric">
+<code class="descclassname">context.</code><code class="descname">filter_alphanumeric</code><span class="sig-paren">(</span><em>str</em><span class="sig-paren">)</span><a class="headerlink" href="#context.filter_alphanumeric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all nonalphanumeric characters from a string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>str</strong> – The string from which to remove nonalphanumeric characters.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The string with nonalphanumeric characters removed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="context.get_literal_type">
+<code class="descclassname">context.</code><code class="descname">get_literal_type</code><span class="sig-paren">(</span><em>first_char</em><span class="sig-paren">)</span><a class="headerlink" href="#context.get_literal_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the type of a literal. Can only handle numbers, booleans, and strings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>first_char</strong> – The first character of the literal.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The type of the literal.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="context.literal_complete">
+<code class="descclassname">context.</code><code class="descname">literal_complete</code><span class="sig-paren">(</span><em>type</em>, <em>current_value</em><span class="sig-paren">)</span><a class="headerlink" href="#context.literal_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a boolean value indicating whether the current literal could be complete.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>type</strong> – The type of the literal.</li>
+<li><strong>current_value</strong> – The literal to consider.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A value indicating whether the current literal could be complete.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="classifier.html">Classifier</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Context</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="filter.html">Filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="human_benchmarker.html">Human Benchmarker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input.html">Input</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="classifier.html" title="previous chapter">Classifier</a></li>
+      <li>Next: <a href="filter.html" title="next chapter">Filter</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/context.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Eric Higgins, Josh High, Zak Kulphongpatana.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/context.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

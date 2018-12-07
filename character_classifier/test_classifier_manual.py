@@ -1,3 +1,8 @@
+"""
+A script for manually testing the entire character classification and context parsing algorithm. 
+When the user enters a character, it fetches a character of that class from the dataset, shows it to the user,
+and passes it to the context parser as the actual software would.
+"""
 import classifier
 import numpy as np
 import context
@@ -15,9 +20,23 @@ mappings = {
 }
 
 def encode(char):
+    """
+    Encodes a character as its class mapping.
+
+    :param char: The character to encode.
+    :type char: char
+    :returns: The character class mapping for `char`.
+    """
     return mappings[char]
 
 def list_from_regex(regex_str):
+    """
+    Gets a list of characters accepted by the given regular expression.
+
+    :param regex_str: The regex to consider.
+    :type regex_str: string
+    :returns: A list of characters accepted by the `regex_str`.
+    """
     print(regex_str)
     regex = re.compile(regex_str)
     result = []
@@ -28,6 +47,13 @@ def list_from_regex(regex_str):
     return result
 
 def decode(index):
+    """
+    Decodes a class encoding as its character.
+
+    :param index: The class encoding to decode.
+    :type index: int
+    :returns: The decoded character.
+    """
     for k, v in mappings.items():
         if v == index: return k
 

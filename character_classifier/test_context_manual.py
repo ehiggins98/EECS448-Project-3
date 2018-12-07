@@ -1,3 +1,7 @@
+"""
+A script for testing the context parser manually. It simply prints valid characters and, when the user enters a
+character, that character is passed to the context parser.
+"""
 import context
 
 top_level = context.Scope({})

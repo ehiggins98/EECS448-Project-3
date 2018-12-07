@@ -1,12 +1,19 @@
+"""
+Contains utilities for thresholding a BGR image.
+"""
 import cv2
 import numpy
 import math
 from enum import Enum
 
 class ColorFilter:
+    """
+    Contains utilities for thresholding a BGR image.
+    """
 
     def __init__(self):
-        """initializes all values to presets or None if need to be set
+        """
+        Initializes all values to presets or None if need to be set
         """
 
         self.__hsv_threshold_hue = [19.424463519089514, 180.0]
@@ -19,6 +26,9 @@ class ColorFilter:
     def process(self, source0):
         """
         Runs the pipeline and sets all outputs to new values.
+
+        :param source0: The BGR image to process.
+        :type source0: np.ndarray
         """
         # Step HSV_Threshold0:
         self.__hsv_threshold_input = source0
@@ -27,14 +37,18 @@ class ColorFilter:
 
     @staticmethod
     def __hsv_threshold(input, hue, sat, val):
-        """Segment an image based on hue, saturation, and value ranges.
-        Args:
-            input: A BGR numpy.ndarray.
-            hue: A list of two numbers the are the min and max hue.
-            sat: A list of two numbers the are the min and max saturation.
-            lum: A list of two numbers the are the min and max value.
-        Returns:
-            A black and white numpy.ndarray.
+        """
+        Threshold an image based on hue, saturation, and value ranges.
+        
+        :param input: A BGR image.
+        :type input: np.ndarray
+        :param hue: A list containing only the min and max hue.
+        :type hue: [float]
+        :param sat: A list containing only the min and max saturation.
+        :type sat: [float]
+        :param val: A list containing only the min and max value.
+        :type val: [float]
+        :returns: A black and white np.ndarray representing the thresholded image.
         """
         out = cv2.cvtColor(input, cv2.COLOR_BGR2HSV)
         return cv2.inRange(out, (hue[0], sat[0], val[0]),  (hue[1], sat[1], val[1]))
